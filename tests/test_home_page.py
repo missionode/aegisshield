@@ -21,16 +21,26 @@ def test_home_page_diagnose_button():
 @pytest.mark.asyncio
 async def test_state_start_diagnosis():
     """Verify the state transition for starting a diagnosis."""
-    # Reflex state testing involves creating an instance
     state = State()
     assert state.is_scanning is False
     assert state.domain == ""
     
-    # Try with empty domain
-    state.start_diagnosis()
-    assert state.is_scanning is False
-    
     # Try with domain
     state.domain = "google.com"
-    state.start_diagnosis()
+    # start_diagnosis is now an async generator
+    gen = state.start_diagnosis()
+    
+    # First yield should set is_scanning to True
+    await gen.__anext__()
     assert state.is_scanning is True
+    assert "Verifying SSL" in state.scan_status
+    
+    # Cleanup remaining yields to avoid unawaited generator warnings
+    try:
+        while True:
+            await gen.__anext__()
+    except StopAsyncIteration:
+        pass
+        
+    assert state.is_scanning is False
+    assert state.scan_status == "Diagnosis Complete"
