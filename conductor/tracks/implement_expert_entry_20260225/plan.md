@@ -13,10 +13,10 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Expert Entry UI & Scaffolding' (Protocol in workflow.md) 97e7f1d
 
 ## Phase 2: Core Engine & Scan Operations
-- [ ] Task: Remote Scanning Engine (FastAPI)
-    - [ ] Implement asynchronous SSL/TLS certificate verification.
-    - [ ] Implement Security Header analysis worker.
-    - [ ] Implement basic Port Scanning (HTTP/HTTPS, etc.).
+- [x] Task: Remote Scanning Engine (FastAPI) 436a88a
+    - [x] Implement asynchronous SSL/TLS certificate verification.
+    - [x] Implement Security Header analysis worker.
+    - [x] Implement basic Port Scanning (HTTP/HTTPS, etc.).
 - [ ] Task: Health Score Logic
     - [ ] Develop the weighted algorithm for score calculation.
     - [ ] Implement real-time status updates (WebSockets) for the scanning process.
