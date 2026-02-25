@@ -97,9 +97,13 @@ def index() -> rx.Component:
                         rx.hstack(
                             rx.input(
                                 placeholder="example.com",
+                                type_="text",
                                 value=State.domain,
                                 on_change=State.set_domain,
-                                class_name="bg-midnight-panel/70 border border-white/10 text-white px-6 py-4 rounded-lg w-96 focus:outline-none focus:border-accent-cyan/50 backdrop-blur-glass",
+                                px="6",
+                                py="4",
+                                class_name="bg-midnight-panel/80 border border-white/20 text-white placeholder:text-white/30 rounded-lg w-96 focus:outline-none focus:border-accent-cyan/50 backdrop-blur-glass",
+                                style={"color": "white"},
                             ),
                             rx.button(
                                 "Diagnose",
