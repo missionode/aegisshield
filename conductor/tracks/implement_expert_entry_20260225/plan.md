@@ -4,9 +4,9 @@
 - [x] Task: Project Scaffolding 1c94f54
     - [x] Initialize Reflex project structure.
     - [x] Configure Tailwind CSS v4 variables as per the Design System.
-- [ ] Task: Home Page UI Development
-    - [ ] Implement the "Expert Entry" neon input field.
-    - [ ] Design the "Expertise" brand identity on the home page.
+- [x] Task: Home Page UI Development ddbf96a
+    - [x] Implement the "Expert Entry" neon input field.
+    - [x] Design the "Expertise" brand identity on the home page.
 - [ ] Task: Diagnosis HUD (Skeleton)
     - [ ] Create the "Glassmorphism" panel for displaying scan results.
     - [ ] Implement the Instant Health Score indicator (0-100 radial/linear).
