@@ -1,7 +1,12 @@
+# AegisShield Git Ignore
 .venv/
+venv/
 __pycache__/
 *.pyc
-.reflex/
-.web/
-.db/
+.DS_Store
+*.pid
+logs/*.log
+logs/*.json
+dataset/
+node_modules/
 .env
