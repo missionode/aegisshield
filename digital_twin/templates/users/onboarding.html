@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Onboarding - Plant Doctor</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-primary: #3a6960;
+            --color-deep-moss: #3a6960;
+            --color-snow-blossom: #fdfcfc;
+            --color-soil-grey: #64748b;
+            --color-sunlight-glow: #F59E0B;
+            --color-accent-pink: #D7A3A6;
+            --color-bark-brown: #433422;
+            --color-background-light: #fdfcfc;
+            --color-background-dark: #18302d;
+            --color-surface-dark: #2B443F;
+
+            --font-display: "Epilogue", sans-serif;
+
+            --radius-DEFAULT: 0.5rem;
+            --radius-lg: 1rem;
+            --radius-xl: 1.5rem;
+            --radius-full: 9999px;
+        }
+        @custom-variant dark (&:where(.dark, .dark *));
+    </style>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        body { font-family: 'Epilogue', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-snow-blossom h-screen flex flex-col overflow-hidden font-display">
+    
+    <!-- Skip to Scanner -->
+    <div class="absolute top-6 right-6 z-20">
+        <a href="{% url 'diagnose:dashboard' %}" class="text-soil-grey font-bold text-sm hover:text-deep-moss">Skip</a>
+    </div>
+
+    <!-- Carousel -->
+    <div class="flex-1 w-full grid grid-flow-col auto-cols-[100%] overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-smooth" id="carousel">
+        
+        <!-- Slide 1: Snap -->
+        <div class="min-w-full w-full h-full snap-center shrink-0 flex flex-col items-center justify-center p-8 text-center" id="slide1">
+            <div class="w-full max-w-xs aspect-square bg-deep-moss/5 rounded-full flex items-center justify-center mb-10 relative">
+                 <div class="absolute inset-4 border-2 border-dashed border-deep-moss/20 rounded-full animate-spin-slow" style="animation-duration: 10s"></div>
+                 <span class="material-symbols-outlined text-8xl text-deep-moss">center_focus_strong</span>
+            </div>
+            <h2 class="text-3xl font-black text-deep-moss mb-4">Snap a Photo</h2>
+            <p class="text-soil-grey text-lg max-w-xs leading-relaxed">
+                Frame your plant's leaf in the camera. Make sure the lighting is good for the best results.
+            </p>
+        </div>
+
+        <!-- Slide 2: Diagnose -->
+        <div class="min-w-full w-full h-full snap-center shrink-0 flex flex-col items-center justify-center p-8 text-center" id="slide2">
+             <div class="w-full max-w-xs aspect-square bg-sunlight-glow/10 rounded-full flex items-center justify-center mb-10 relative">
+                 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-1 bg-sunlight-glow shadow-[0_0_20px_rgba(245,158,11,0.5)] animate-pulse"></div>
+                 <span class="material-symbols-outlined text-8xl text-sunlight-glow">health_and_safety</span>
+            </div>
+            <h2 class="text-3xl font-black text-deep-moss mb-4">Instant Diagnosis</h2>
+            <p class="text-soil-grey text-lg max-w-xs leading-relaxed">
+                Our AI analyzes the patterns to detect over 100+ diseases and pest issues instantly.
+            </p>
+        </div>
+
+        <!-- Slide 3: Heal -->
+        <div class="min-w-full w-full h-full snap-center shrink-0 flex flex-col items-center justify-center p-8 text-center" id="slide3">
+             <div class="w-full max-w-xs aspect-square bg-accent-pink/20 rounded-full flex items-center justify-center mb-10">
+                 <span class="material-symbols-outlined text-8xl text-accent-pink">spa</span>
+            </div>
+            <h2 class="text-3xl font-black text-deep-moss mb-4">Heal Your Plant</h2>
+            <p class="text-soil-grey text-lg max-w-xs leading-relaxed mb-8">
+                Get a custom step-by-step care plan to nurse your green friend back to health.
+            </p>
+            <a href="{% url 'diagnose:dashboard' %}" class="inline-flex items-center justify-center h-14 px-10 rounded-xl bg-sunlight-glow text-deep-moss font-bold shadow-lg shadow-sunlight-glow/25 hover:bg-sunlight-glow/90 transition-all active:scale-95">
+                Get Started
+            </a>
+        </div>
+    </div>
+
+    <!-- Pagination Dots -->
+    <div class="h-20 flex items-center justify-center gap-3">
+        <div class="w-2.5 h-2.5 rounded-full bg-deep-moss w-6 transition-all duration-300 cursor-pointer" id="dot1"></div>
+        <div class="w-2.5 h-2.5 rounded-full bg-slate-300 transition-all duration-300 cursor-pointer" id="dot2"></div>
+        <div class="w-2.5 h-2.5 rounded-full bg-slate-300 transition-all duration-300 cursor-pointer" id="dot3"></div>
+    </div>
+
+    <script>
+        const carousel = document.getElementById('carousel');
+        const dots = [document.getElementById('dot1'), document.getElementById('dot2'), document.getElementById('dot3')];
+
+        carousel.addEventListener('scroll', () => {
+            const scrollLeft = carousel.scrollLeft;
+            const width = carousel.offsetWidth;
+            const index = Math.round(scrollLeft / width);
+
+            dots.forEach((dot, i) => {
+                if (i === index) {
+                    dot.classList.remove('bg-slate-300');
+                    dot.classList.add('bg-deep-moss', 'w-6'); // Active state: wider and colored
+                } else {
+                    dot.classList.remove('bg-deep-moss', 'w-6');
+                    dot.classList.add('bg-slate-300');
+                }
+            });
+        });
+
+        // Add click event listeners to dots
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                const width = carousel.offsetWidth;
+                carousel.scrollTo({
+                    left: width * index,
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

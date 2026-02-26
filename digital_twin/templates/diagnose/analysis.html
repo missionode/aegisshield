@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Analyzing - Plant Doctor</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-primary: #3a6960;
+            --color-deep-moss: #3a6960;
+            --color-snow-blossom: #fdfcfc;
+            --color-soil-grey: #64748b;
+            --color-sunlight-glow: #F59E0B;
+            --color-accent-pink: #D7A3A6;
+            --color-bark-brown: #433422;
+            --color-background-light: #fdfcfc;
+            --color-background-dark: #18302d;
+            --color-surface-dark: #2B443F;
+
+            --font-display: "Epilogue", sans-serif;
+
+            --radius-DEFAULT: 0.5rem;
+            --radius-lg: 1rem;
+            --radius-xl: 1.5rem;
+            --radius-full: 9999px;
+        }
+        @custom-variant dark (&:where(.dark, .dark *));
+    </style>
+    <style>
+        body { font-family: 'Epilogue', sans-serif; }
+        @keyframes scan {
+            0% { top: 10%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 90%; opacity: 0; }
+        }
+        .laser-line {
+            animation: scan 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+    </style>
+</head>
+<body class="bg-black h-screen overflow-hidden font-display flex flex-col">
+    
+    <div class="relative flex-1 w-full overflow-hidden">
+        <!-- Captured Image -->
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('{{ scan.image.url }}'); filter: grayscale(50%) brightness(0.6);"></div>
+
+        <!-- Scanning Overlay -->
+        <div class="absolute inset-0 z-10">
+            <div class="laser-line absolute left-0 w-full h-1 bg-sunlight-glow shadow-[0_0_25px_4px_rgba(245,158,11,0.8)]"></div>
+        </div>
+
+        <!-- Status Card -->
+        <div class="absolute bottom-12 left-6 right-6 z-20">
+            <div class="bg-snow-blossom/90 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-2xl flex flex-col items-center text-center gap-3">
+                <div class="flex items-center gap-3">
+                     <div id="status-icon" class="w-3 h-3 rounded-full bg-deep-moss animate-ping"></div>
+                     <h2 class="text-deep-moss text-lg font-bold uppercase tracking-widest" id="status-text">Analyzing leaf patterns...</h2>
+                </div>
+                <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden mt-2" id="progress-container">
+                    <div class="bg-deep-moss h-full w-0 transition-all duration-300 rounded-full" id="progress-bar"></div>
+                </div>
+                <a id="manual-redirect-btn" href="#" class="hidden mt-2 text-sm font-bold text-deep-moss underline hover:text-sunlight-glow transition-colors">
+                    Click here if not redirected...
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const statusEl = document.getElementById('status-text');
+        const progressEl = document.getElementById('progress-bar');
+        const statusIcon = document.getElementById('status-icon');
+        const manualBtn = document.getElementById('manual-redirect-btn');
+        const progressContainer = document.getElementById('progress-container');
+        
+        // Initial progress
+        setTimeout(() => { progressEl.style.width = '20%'; }, 100);
+        setTimeout(() => { progressEl.style.width = '50%'; }, 2000);
+        setTimeout(() => { progressEl.style.width = '80%'; }, 5000);
+
+        // Call the analysis API
+        fetch("{% url 'diagnose:start_analysis' scan.id %}")
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    progressEl.style.width = '100%';
+                    statusEl.innerText = "Diagnosis complete!";
+                    statusIcon.classList.remove('animate-ping');
+                    
+                    // Show manual link just in case
+                    manualBtn.href = data.redirect_url;
+                    manualBtn.classList.remove('hidden');
+                    
+                    setTimeout(() => {
+                        window.location.href = data.redirect_url;
+                    }, 500);
+                } else {
+                    statusEl.innerText = "Analysis failed. Redirecting...";
+                    setTimeout(() => {
+                        window.location.href = "{% url 'diagnose:dashboard' %}";
+                    }, 2000);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                statusEl.innerText = "Connection error.";
+            });
+    </script>
+</body>
+</html>

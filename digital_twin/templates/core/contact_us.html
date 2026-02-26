@@ -1,0 +1,51 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Contact Us - Plant Doctor{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-4xl mx-auto px-6 py-20 flex flex-col items-center text-center">
+    <div class="w-20 h-20 bg-deep-moss/10 rounded-full flex items-center justify-center text-deep-moss mb-6">
+        <span class="material-symbols-outlined text-4xl">mail</span>
+    </div>
+    
+    <h1 class="text-4xl font-black text-deep-moss mb-4 font-display">Get in Touch</h1>
+    <p class="text-lg text-soil-grey max-w-xl mx-auto mb-12">
+        Have questions about your plants, our AI, or just want to say hello? We'd love to hear from you.
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-2xl">
+        <!-- Email Card -->
+        <a href="mailto:contact@plantdoctor.com" class="flex flex-col items-center p-8 bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <span class="material-symbols-outlined text-3xl text-sunlight-glow mb-4">alternate_email</span>
+            <h3 class="text-xl font-bold text-deep-moss mb-2">Email Us</h3>
+            <p class="text-soil-grey text-sm mb-4">For general inquiries and support</p>
+            <span class="text-deep-moss font-bold">contact@plantdoctor.com</span>
+        </a>
+
+        <!-- Support Card -->
+        <div class="flex flex-col items-center p-8 bg-white rounded-3xl border border-slate-100 shadow-sm">
+            <span class="material-symbols-outlined text-3xl text-accent-pink mb-4">support_agent</span>
+            <h3 class="text-xl font-bold text-deep-moss mb-2">Help Center</h3>
+            <p class="text-soil-grey text-sm mb-4">Check our FAQ for quick answers</p>
+            <button class="text-deep-moss font-bold opacity-50 cursor-not-allowed">Coming Soon</button>
+        </div>
+    </div>
+
+    <!-- Socials -->
+    <div class="mt-16">
+        <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">Follow Us</h4>
+        <div class="flex gap-6">
+            <a href="https://facebook.com/plantdoctor" target="_blank" rel="noopener noreferrer" class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-deep-moss hover:text-white transition-all" title="Facebook">
+                <span class="material-symbols-outlined">public</span>
+            </a>
+            <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-deep-moss hover:text-white transition-all" title="Instagram">
+                <span class="material-symbols-outlined">photo_camera</span>
+            </a>
+            <a href="{% url 'core:blog' %}" class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-deep-moss hover:text-white transition-all" title="Our Blog">
+                <span class="material-symbols-outlined">rss_feed</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

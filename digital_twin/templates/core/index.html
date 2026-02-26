@@ -1,0 +1,143 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- HeroSection -->
+<section class="@container">
+    <div class="flex flex-col gap-8 px-4 py-8 @[480px]:py-12 @[864px]:flex-row @[864px]:items-center">
+        <div class="relative w-full aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl @[864px]:flex-1">
+            <div class="absolute inset-0 bg-cover bg-center transition-transform hover:scale-105 duration-700" data-alt="Close up of a person holding a phone scanning a green Monstera leaf" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD2aSBhhUDUzI7XZTBMhamTembCgWxBGFIEHPReC3PrT9fqf8uQyDzRr7jnSDtpnUF_1ceFhTMgq9RQPHFcKO_QgxLdpbVBqOFb2mr0BBnnlScRTPDxqOUsz2b1RZnGEjglzSxenAUwIXW-wouALz095Us31TC-oub0ENbf1kslGVQ07kVb7D3Z_YM9BUJrX_KRkPu-JkvraQRf9K0iCTeInzx8d-LLFjJoALAaRHTxG2NfC-Y3uSQBNsFV-lACdbV00BA60pxhsrVX");'>
+            </div>
+            <!-- AI Scanning Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
+            <div class="absolute inset-4 border-2 border-dashed border-white/30 rounded-2xl flex items-center justify-center">
+                <div class="w-full h-[2px] bg-primary absolute animate-pulse shadow-[0_0_15px_rgba(58,105,96,0.8)]"></div>
+                <div class="absolute bottom-6 left-6 right-6 p-4 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 rounded-full bg-green-400 animate-ping"></div>
+                        <p class="text-white text-xs font-medium uppercase tracking-widest">Analyzing Health... 89%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-col gap-6 @[864px]:flex-1">
+            <div class="flex flex-col gap-3">
+                <span class="inline-block px-3 py-1 rounded-full bg-accent-pink/20 text-accent-pink text-xs font-bold uppercase tracking-widest w-fit">AI-Powered Care</span>
+                <h1 class="text-slate-900 dark:text-white text-4xl font-black leading-[1.1] tracking-tight @[480px]:text-6xl font-display">
+                    Save Your Plants <span class="text-primary italic">with AI</span>
+                </h1>
+                <p class="text-slate-600 dark:text-[#a4b7b4] text-base @[480px]:text-lg font-normal leading-relaxed">
+                    Identify diseases and get expert care plans in seconds. Your personal botanist is just a tap away. Join 100k+ happy gardeners.
+                </p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-4 px-2 sm:px-0">
+                <a href="{% if user.is_authenticated %}{% url 'diagnose:scanner' %}{% else %}{% url 'users:login' %}{% endif %}" class="flex items-center justify-center rounded-xl h-14 px-10 bg-sunlight-glow text-deep-moss text-lg font-bold shadow-lg shadow-sunlight-glow/25 hover:bg-sunlight-glow/90 transition-all active:scale-95 w-full sm:w-fit">
+                    <span class="material-symbols-outlined mr-2">{% if user.is_authenticated %}photo_camera{% else %}arrow_forward{% endif %}</span>
+                    <span>{% if user.is_authenticated %}Scan Plant{% else %}Get Started{% endif %}</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FeatureSection Header -->
+<div class="px-4 mt-8">
+    <h4 class="text-primary dark:text-accent-pink text-sm font-black leading-normal uppercase tracking-[0.2em] text-center">Engineered for Nature</h4>
+</div>
+
+<!-- FeatureSection Grid -->
+<section class="flex flex-col gap-10 px-4 py-8 @container">
+    <div class="flex flex-col gap-4 text-center items-center">
+        <h2 class="text-slate-900 dark:text-white text-3xl font-bold leading-tight @[480px]:text-4xl max-w-[720px] font-display">
+            Everything you need for healthy plants
+        </h2>
+        <div class="h-1.5 w-20 bg-primary rounded-full"></div>
+    </div>
+    <div class="grid grid-cols-1 @[480px]:grid-cols-2 @[864px]:grid-cols-3 gap-6">
+        <!-- Feature 1 -->
+        <div class="group flex flex-col gap-5 rounded-2xl border border-slate-200 dark:border-primary/20 bg-white dark:bg-surface-dark p-6 transition-all hover:border-primary/40 hover:-translate-y-1">
+            <div class="flex size-14 items-center justify-center rounded-2xl bg-primary text-white shadow-inner">
+                <span class="material-symbols-outlined text-3xl">photo_camera</span>
+            </div>
+            <div class="flex flex-col gap-2">
+                <h3 class="text-slate-900 dark:text-white text-xl font-bold leading-tight">Instant Diagnosis</h3>
+                <p class="text-slate-600 dark:text-[#a4b7b4] text-sm leading-relaxed">
+                    Snap a photo to detect 100+ plant diseases instantly with 98% accuracy powered by machine learning.
+                </p>
+            </div>
+        </div>
+        <!-- Feature 2 -->
+        <div class="group flex flex-col gap-5 rounded-2xl border border-slate-200 dark:border-primary/20 bg-white dark:bg-surface-dark p-6 transition-all hover:border-primary/40 hover:-translate-y-1">
+            <div class="flex size-14 items-center justify-center rounded-2xl bg-primary/20 text-primary dark:text-primary-light">
+                <span class="material-symbols-outlined text-3xl">notifications_active</span>
+            </div>
+            <div class="flex flex-col gap-2">
+                <h3 class="text-slate-900 dark:text-white text-xl font-bold leading-tight">Care Reminders</h3>
+                <p class="text-slate-600 dark:text-[#a4b7b4] text-sm leading-relaxed">
+                    Custom schedules tailored to your plant's species and local climate. Never forget to water again.
+                </p>
+            </div>
+        </div>
+        <!-- Feature 3 -->
+        <div class="group flex flex-col gap-5 rounded-2xl border border-slate-200 dark:border-primary/20 bg-white dark:bg-surface-dark p-6 transition-all hover:border-primary/40 hover:-translate-y-1 @[480px]:col-span-2 @[864px]:col-span-1">
+            <div class="flex size-14 items-center justify-center rounded-2xl bg-accent-pink/20 text-accent-pink">
+                <span class="material-symbols-outlined text-3xl">psychiatry</span>
+            </div>
+            <div class="flex flex-col gap-2">
+                <h3 class="text-slate-900 dark:text-white text-xl font-bold leading-tight">Expert Advice</h3>
+                <p class="text-slate-600 dark:text-[#a4b7b4] text-sm leading-relaxed">
+                    Chat with certified botanical specialists 24/7 for tailored help with those tricky indoor jungles.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonial Section -->
+<section class="px-4 py-16 bg-slate-50 dark:bg-transparent">
+    <div class="flex flex-col items-center gap-2 mb-8">
+        <h4 class="text-primary dark:text-[#a4b7b4] text-xs font-black uppercase tracking-widest">Happy Gardeners</h4>
+        <div class="flex text-accent-pink gap-1">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+        </div>
+    </div>
+    <div class="relative max-w-lg mx-auto bg-white dark:bg-surface-dark rounded-3xl p-8 border border-slate-200 dark:border-primary/20 shadow-xl overflow-hidden">
+        <div class="absolute -top-10 -right-10 size-40 bg-accent-pink/5 rounded-full blur-3xl"></div>
+        <div class="relative z-10 text-center">
+            <span class="material-symbols-outlined text-5xl text-primary/30 mb-4">format_quote</span>
+            <p class="text-slate-800 dark:text-white text-xl font-medium leading-relaxed italic mb-8">
+                "I used to kill every plant I bought. Plant Doctor helped me diagnose a fungal issue on my Fiddle Leaf Fig and now it's finally thriving with three new leaves!"
+            </p>
+            <div class="flex flex-col items-center">
+                <div class="size-14 rounded-full bg-cover bg-center border-2 border-primary mb-3" data-alt="Portrait of a smiling home gardener" style="background-image: url('https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop');"></div>
+                <h5 class="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-sm">Priya Sharma</h5>
+                <p class="text-primary text-xs font-medium">Home Gardener, Bangalore</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Final CTA -->
+<section class="p-4 py-12">
+    <div class="relative overflow-hidden rounded-[2.5rem] bg-primary px-6 py-12 text-center shadow-2xl">
+        <div class="absolute top-0 right-0 p-8 opacity-20 transform translate-x-10 -translate-y-10 scale-150 rotate-12">
+            <span class="material-symbols-outlined text-9xl text-white">eco</span>
+        </div>
+        <div class="relative z-10 flex flex-col items-center gap-6">
+            <h2 class="text-white text-3xl font-black leading-tight max-w-[400px] font-display">
+                Your personal botanist is just a tap away.
+            </h2>
+            <p class="text-white/80 text-sm max-w-xs">
+                Join over 100,000 plant lovers and start your journey to a greener home today.
+            </p>
+            <a href="{% if user.is_authenticated %}{% url 'diagnose:dashboard' %}{% else %}{% url 'users:login' %}{% endif %}" class="inline-flex items-center justify-center rounded-xl h-14 px-10 bg-white text-deep-moss text-lg font-bold shadow-xl hover:bg-slate-50 transition-all active:scale-95">
+                <span>{% if user.is_authenticated %}Go to Dashboard{% else %}Get Started for Free{% endif %}</span>
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Plant Doctor{% endblock %}
+
+{% block content %}
+<!-- Main Content -->
+<div class="flex-1 p-6 flex flex-col gap-8">
+    
+    <!-- Welcome Header -->
+    <div>
+        <p class="text-soil-grey text-xs font-bold uppercase tracking-wider mb-1">Welcome Back, {{ user.full_name|default:user.username }}</p>
+        <h1 class="text-2xl font-black text-deep-moss">My Garden</h1>
+    </div>
+
+    <!-- Weather/Status Summary -->
+    <div class="bg-deep-moss rounded-2xl p-6 text-white shadow-xl shadow-deep-moss/20 relative overflow-hidden">
+        <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+        <div class="relative z-10">
+            <div class="flex items-center gap-2 mb-2 opacity-80">
+                <span class="material-symbols-outlined text-lg">wb_sunny</span>
+                <span class="text-xs font-bold uppercase tracking-widest">Good Growing Weather</span>
+            </div>
+            <p class="text-sm leading-relaxed max-w-[80%]">
+                Your plants are happy! Remember to check your garden's moisture today.
+            </p>
+        </div>
+    </div>
+
+    <!-- Quick Action Button -->
+    <div class="px-2">
+        <a href="{% url 'diagnose:scanner' %}" class="w-full flex items-center justify-center gap-4 bg-sunlight-glow text-deep-moss py-5 rounded-[2rem] shadow-xl shadow-sunlight-glow/20 hover:bg-sunlight-glow/90 hover:-translate-y-1 transition-all active:scale-95 group">
+            <span class="material-symbols-outlined text-4xl group-hover:rotate-12 transition-transform">photo_camera</span>
+            <span class="font-black text-xl uppercase tracking-tight">Scan New Plant</span>
+        </a>
+    </div>
+
+    <!-- Scanning History Section -->
+    <div class="flex-1 flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-deep-moss">Recent Scans</h2>
+            <button class="text-soil-grey text-sm font-medium hover:text-deep-moss">View All</button>
+        </div>
+
+        {% if scans %}
+            <div class="grid grid-cols-1 gap-4">
+                {% for scan in scans %}
+                <a href="{% if scan.disease %}{% url 'diagnose:result' scan.id %}{% else %}{% url 'diagnose:analysis' scan.id %}{% endif %}" class="flex items-center gap-4 p-4 bg-white rounded-2xl border {% if scan.is_favorite %}border-deep-moss/30 shadow-md{% else %}border-slate-100 shadow-sm{% endif %} hover:border-primary/40 transition-all group relative overflow-hidden">
+                    {% if scan.is_favorite %}
+                    <div class="absolute top-0 right-0 w-8 h-8 bg-deep-moss rounded-bl-2xl flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white text-xs">bookmark</span>
+                    </div>
+                    {% endif %}
+                    
+                    <img src="{{ scan.image.url }}" class="w-16 h-16 rounded-xl object-cover" alt="Scan">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2">
+                            <h4 class="font-bold text-deep-moss">{{ scan.disease.name|default:"Processing..." }}</h4>
+                        </div>
+                        <p class="text-xs text-soil-grey">{{ scan.date|date:"F j, Y" }}</p>
+                    </div>
+                    <span class="material-symbols-outlined text-soil-grey group-hover:translate-x-1 transition-transform">chevron_right</span>
+                </a>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <div class="flex justify-center items-center gap-4 mt-8">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}" class="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-slate-200 text-deep-moss hover:bg-deep-moss hover:text-white transition-all">
+                        <span class="material-symbols-outlined">chevron_left</span>
+                    </a>
+                {% else %}
+                    <span class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 border border-slate-100 text-slate-300 cursor-not-allowed">
+                        <span class="material-symbols-outlined">chevron_left</span>
+                    </span>
+                {% endif %}
+
+                <span class="text-sm font-bold text-deep-moss">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-slate-200 text-deep-moss hover:bg-deep-moss hover:text-white transition-all">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </a>
+                {% else %}
+                    <span class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 border border-slate-100 text-slate-300 cursor-not-allowed">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </span>
+                {% endif %}
+            </div>
+            {% endif %}
+
+        {% else %}
+            <!-- Empty State -->
+            <div class="flex-1 flex flex-col items-center justify-center py-12 border-2 border-dashed border-slate-200 rounded-3xl bg-slate-50/50">
+                <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4 text-slate-300">
+                    <span class="material-symbols-outlined text-4xl">history_edu</span>
+                </div>
+                <h3 class="text-deep-moss font-bold text-lg mb-2">No Scans Yet</h3>
+                <p class="text-soil-grey text-center text-sm max-w-[200px]">
+                    Your scanning history will appear here once you diagnose your first plant.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Plant Care Blog - Plant Doctor{% endblock %}
+
+{% block content %}
+<div class="flex flex-col items-center w-full pb-20">
+
+    <!-- Hero Section -->
+    <div class="w-full bg-deep-moss/5 py-16 px-6 text-center mb-12">
+        <h1 class="text-4xl md:text-5xl font-black text-deep-moss mb-4 font-display">Green Thumb Gazette</h1>
+        <p class="text-lg text-soil-grey max-w-xl mx-auto">
+            Curated articles and guides from the world's largest open encyclopedia to help you become a better plant parent.
+        </p>
+    </div>
+
+    <!-- Blog Grid -->
+    <div class="w-full max-w-7xl px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for article in articles %}
+        <article class="flex flex-col bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group h-full">
+            <!-- Image -->
+            <div class="relative h-64 overflow-hidden bg-slate-100">
+                <img src="{{ article.image_url }}" alt="{{ article.title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-deep-moss uppercase tracking-wider">
+                    Plant Care
+                </div>
+            </div>
+            
+            <!-- Content -->
+            <div class="flex-1 p-8 flex flex-col">
+                <div class="flex items-center gap-2 mb-4 text-xs font-medium text-slate-400">
+                    <span class="material-symbols-outlined text-sm">schedule</span>
+                    <span>{{ article.date }}</span>
+                    <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+                    <span>{{ article.author }}</span>
+                </div>
+                
+                <h3 class="text-xl font-bold text-deep-moss mb-3 leading-tight group-hover:text-sunlight-glow transition-colors">
+                    {{ article.title }}
+                </h3>
+                
+                <p class="text-soil-grey text-sm leading-relaxed mb-6 flex-1">
+                    {{ article.summary }}
+                </p>
+                
+                <a href="{{ article.link }}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-deep-moss font-bold text-sm hover:gap-3 transition-all">
+                    Read Full Article 
+                    <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                </a>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+
+    <!-- Empty State / Loading Fallback (if no articles) -->
+    {% if not articles %}
+    <div class="text-center py-20">
+        <span class="material-symbols-outlined text-6xl text-slate-300 mb-4">grass</span>
+        <h3 class="text-xl font-bold text-deep-moss">Growing content...</h3>
+        <p class="text-slate-500 mt-2">Check back later for fresh articles.</p>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

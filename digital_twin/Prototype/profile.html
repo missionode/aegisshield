@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>My Profile - Plant Doctor</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-primary: #3a6960;
+            --color-deep-moss: #3a6960;
+            --color-snow-blossom: #fdfcfc;
+            --color-soil-grey: #64748b;
+            --color-sunlight-glow: #F59E0B;
+            --color-accent-pink: #D7A3A6;
+            --color-bark-brown: #433422;
+            --color-background-light: #fdfcfc;
+            --color-background-dark: #18302d;
+            --color-surface-dark: #2B443F;
+
+            --font-display: "Epilogue", sans-serif;
+
+            --radius-DEFAULT: 0.5rem;
+            --radius-lg: 1rem;
+            --radius-xl: 1.5rem;
+            --radius-full: 9999px;
+        }
+        @custom-variant dark (&:where(.dark, .dark *));
+    </style>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        body { font-family: 'Epilogue', sans-serif; }
+    </style>
+</head>
+<body class="bg-snow-blossom min-h-screen font-display flex flex-col">
+    
+    <!-- Top Bar -->
+    <div class="p-6 flex items-center sticky top-0 bg-snow-blossom/90 backdrop-blur-md z-10">
+        <a href="dashboard.html" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-deep-moss hover:bg-slate-200 transition-colors mr-4">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <h1 class="text-xl font-bold text-deep-moss">My Profile</h1>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 px-6 pb-24 flex flex-col items-center">
+        
+        <!-- Profile Picture -->
+        <div class="relative mb-8">
+            <div class="w-32 h-32 rounded-full bg-deep-moss/10 flex items-center justify-center border-4 border-white shadow-xl text-deep-moss overflow-hidden">
+                <span class="material-symbols-outlined text-6xl" id="profile-icon">person</span>
+                <!-- Image Placeholder -->
+                <!-- <img src="..." class="w-full h-full object-cover" /> -->
+            </div>
+            <button class="absolute bottom-0 right-0 w-10 h-10 bg-sunlight-glow rounded-full flex items-center justify-center text-deep-moss shadow-lg border-2 border-white hover:scale-105 transition-transform">
+                <span class="material-symbols-outlined text-xl">photo_camera</span>
+            </button>
+        </div>
+
+        <!-- Form -->
+        <form id="profile-form" class="w-full max-w-md flex flex-col gap-5">
+            <div>
+                <label class="block text-sm font-bold text-deep-moss mb-2 ml-1" for="name">Full Name</label>
+                <input type="text" id="name" value="John Doe" disabled
+                    class="w-full px-5 py-4 rounded-xl border-2 border-slate-100 bg-slate-50 text-soil-grey font-medium outline-none transition-all
+                           disabled:bg-slate-50 disabled:text-soil-grey disabled:border-transparent
+                           enabled:bg-white enabled:text-deep-moss enabled:border-deep-moss/20 enabled:focus:border-deep-moss enabled:focus:ring-4 enabled:focus:ring-deep-moss/10">
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-deep-moss mb-2 ml-1" for="email">Email Address</label>
+                <input type="email" id="email" value="gardener@example.com" disabled
+                    class="w-full px-5 py-4 rounded-xl border-2 border-slate-100 bg-slate-50 text-soil-grey font-medium outline-none transition-all
+                           disabled:bg-slate-50 disabled:text-soil-grey disabled:border-transparent
+                           enabled:bg-white enabled:text-deep-moss enabled:border-deep-moss/20 enabled:focus:border-deep-moss enabled:focus:ring-4 enabled:focus:ring-deep-moss/10">
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-deep-moss mb-2 ml-1" for="location">Location</label>
+                <input type="text" id="location" value="Portland, OR" disabled
+                    class="w-full px-5 py-4 rounded-xl border-2 border-slate-100 bg-slate-50 text-soil-grey font-medium outline-none transition-all
+                           disabled:bg-slate-50 disabled:text-soil-grey disabled:border-transparent
+                           enabled:bg-white enabled:text-deep-moss enabled:border-deep-moss/20 enabled:focus:border-deep-moss enabled:focus:ring-4 enabled:focus:ring-deep-moss/10">
+            </div>
+        </form>
+
+    </div>
+
+    <!-- Bottom Action Bar -->
+    <div class="fixed bottom-0 left-0 right-0 p-6 bg-white border-t border-slate-100 shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
+        <button id="edit-btn" class="w-full py-4 rounded-xl bg-deep-moss text-white font-bold text-lg shadow-lg shadow-deep-moss/20 hover:bg-deep-moss/90 transition-all active:scale-95">
+            Edit Profile
+        </button>
+    </div>
+
+    <script>
+        const editBtn = document.getElementById('edit-btn');
+        const formInputs = document.querySelectorAll('#profile-form input');
+        let isEditing = false;
+
+        editBtn.addEventListener('click', () => {
+            isEditing = !isEditing;
+
+            if (isEditing) {
+                // Switch to Edit Mode
+                formInputs.forEach(input => input.disabled = false);
+                formInputs[0].focus(); // Focus first input
+                editBtn.textContent = "Save Changes";
+                editBtn.classList.remove('bg-deep-moss', 'shadow-deep-moss/20');
+                editBtn.classList.add('bg-sunlight-glow', 'text-deep-moss', 'shadow-sunlight-glow/20');
+            } else {
+                // Switch to View Mode (Save)
+                formInputs.forEach(input => input.disabled = true);
+                editBtn.textContent = "Edit Profile";
+                editBtn.classList.add('bg-deep-moss', 'shadow-deep-moss/20');
+                editBtn.classList.remove('bg-sunlight-glow', 'text-deep-moss', 'shadow-sunlight-glow/20');
+                
+                // Simulate Save Feedback
+                const originalText = editBtn.textContent;
+                editBtn.textContent = "Saved!";
+                setTimeout(() => {
+                    editBtn.textContent = originalText;
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>

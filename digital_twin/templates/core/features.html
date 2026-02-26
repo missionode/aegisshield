@@ -1,0 +1,139 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Features & Tutorial - Plant Doctor{% endblock %}
+
+{% block content %}
+<div class="flex flex-col items-center w-full">
+
+    <!-- Hero Section -->
+    <div class="w-full bg-deep-moss/5 py-20 px-6 text-center">
+        <h1 class="text-4xl md:text-5xl font-black text-deep-moss mb-6 font-display">Powerful Features for Thriving Plants</h1>
+        <p class="text-lg md:text-xl text-soil-grey max-w-2xl mx-auto leading-relaxed">
+            Discover how Plant Doctor uses advanced AI to help you identify diseases, get care tips, and keep your garden flourishing.
+        </p>
+    </div>
+
+    <!-- Features Grid -->
+    <div class="w-full max-w-6xl px-6 py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        
+        <!-- Feature 1 -->
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 group">
+            <div class="w-14 h-14 bg-deep-moss/10 rounded-2xl flex items-center justify-center text-deep-moss mb-6 group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-3xl">center_focus_strong</span>
+            </div>
+            <h3 class="text-xl font-bold text-deep-moss mb-3">Instant AI Diagnosis</h3>
+            <p class="text-soil-grey leading-relaxed">
+                Snap a photo of any plant, and our advanced AI instantly identifies diseases, pests, or nutrient deficiencies with high accuracy.
+            </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 group">
+            <div class="w-14 h-14 bg-sunlight-glow/10 rounded-2xl flex items-center justify-center text-sunlight-glow mb-6 group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-3xl">healing</span>
+            </div>
+            <h3 class="text-xl font-bold text-deep-moss mb-3">Actionable Treatment Plans</h3>
+            <p class="text-soil-grey leading-relaxed">
+                Get clear, step-by-step instructions on how to treat your plant immediately and prevent future issues.
+            </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 group">
+            <div class="w-14 h-14 bg-accent-pink/10 rounded-2xl flex items-center justify-center text-accent-pink mb-6 group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-3xl">inventory_2</span>
+            </div>
+            <h3 class="text-xl font-bold text-deep-moss mb-3">Product Recommendations</h3>
+            <p class="text-soil-grey leading-relaxed">
+                Find the exact fertilizers, pesticides, or tools you need to fix the problem, curated specifically for your plant's condition.
+            </p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 group">
+            <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 mb-6 group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-3xl">history_edu</span>
+            </div>
+            <h3 class="text-xl font-bold text-deep-moss mb-3">Garden History</h3>
+            <p class="text-soil-grey leading-relaxed">
+                Keep track of all your scans and plant health over time in your personal dashboard.
+            </p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 group">
+            <div class="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600 mb-6 group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-3xl">wb_sunny</span>
+            </div>
+            <h3 class="text-xl font-bold text-deep-moss mb-3">Care Guides</h3>
+            <p class="text-soil-grey leading-relaxed">
+                Access long-term care guides for specific plant species to ensure they get the right light, water, and nutrients.
+            </p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 group">
+            <div class="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 mb-6 group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-3xl">lock</span>
+            </div>
+            <h3 class="text-xl font-bold text-deep-moss mb-3">Secure & Private</h3>
+            <p class="text-soil-grey leading-relaxed">
+                Your data is safe with us. We value your privacy and ensure your garden data is yours alone.
+            </p>
+        </div>
+    </div>
+
+    <!-- How it Works (Tutorial) Section -->
+    <div class="w-full bg-deep-moss text-white py-20 px-6 relative overflow-hidden">
+        <!-- Background Decor -->
+        <div class="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+        <div class="absolute bottom-0 left-0 w-64 h-64 bg-sunlight-glow/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+
+        <div class="max-w-4xl mx-auto relative z-10 text-center">
+            <h2 class="text-3xl md:text-4xl font-black mb-12 font-display">How to Use Plant Doctor</h2>
+            
+            <div class="flex flex-col md:flex-row items-center md:items-start justify-between gap-12 md:gap-4 relative">
+                <!-- Connecting Line (Desktop) -->
+                <div class="hidden md:block absolute top-12 left-20 right-20 h-0.5 bg-white/20 -z-10"></div>
+
+                <!-- Step 1 -->
+                <div class="flex-1 flex flex-col items-center text-center">
+                    <div class="w-24 h-24 bg-sunlight-glow rounded-full flex items-center justify-center text-deep-moss shadow-lg mb-6 text-4xl font-bold">1</div>
+                    <h3 class="text-xl font-bold mb-2">Snap a Photo</h3>
+                    <p class="text-white/80 text-sm leading-relaxed max-w-xs">
+                        Open the scanner and take a clear picture of the affected leaf or plant part.
+                    </p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flex-1 flex flex-col items-center text-center">
+                    <div class="w-24 h-24 bg-white text-deep-moss rounded-full flex items-center justify-center shadow-lg mb-6 text-4xl font-bold">2</div>
+                    <h3 class="text-xl font-bold mb-2">Wait for Analysis</h3>
+                    <p class="text-white/80 text-sm leading-relaxed max-w-xs">
+                        Our AI analyzes the patterns and symptoms in seconds to identify the issue.
+                    </p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="flex-1 flex flex-col items-center text-center">
+                    <div class="w-24 h-24 bg-accent-pink text-deep-moss rounded-full flex items-center justify-center shadow-lg mb-6 text-4xl font-bold">3</div>
+                    <h3 class="text-xl font-bold mb-2">Get the Cure</h3>
+                    <p class="text-white/80 text-sm leading-relaxed max-w-xs">
+                        Receive a detailed treatment plan and product recommendations to save your plant.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="py-24 text-center px-6">
+        <h2 class="text-3xl font-black text-deep-moss mb-6">Ready to Save Your Garden?</h2>
+        <a href="{% if user.is_authenticated %}{% url 'diagnose:scanner' %}{% else %}{% url 'users:signup' %}{% endif %}" class="inline-block bg-sunlight-glow text-deep-moss font-bold text-lg px-10 py-4 rounded-full shadow-xl shadow-sunlight-glow/30 hover:bg-sunlight-glow/90 hover:-translate-y-1 transition-all">
+            {% if user.is_authenticated %}Start Diagnosis{% else %}Get Started Now{% endif %}
+        </a>
+    </div>
+
+</div>
+{% endblock %}

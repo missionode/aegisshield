@@ -1,0 +1,169 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Diagnosis - Plant Doctor{% endblock %}
+
+{% block extra_head %}
+<style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header Image -->
+<div class="h-72 w-full bg-cover bg-center relative" style="background-image: url('{{ scan.image.url }}');">
+    <div class="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent"></div>
+    <a href="{% url 'diagnose:dashboard' %}" class="absolute top-6 left-6 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all">
+         <span class="material-symbols-outlined">arrow_back</span>
+    </a>
+</div>
+
+<!-- Diagnosis Card -->
+<div class="relative -mt-12 mx-auto w-full max-w-2xl bg-snow-blossom rounded-t-[2.5rem] px-6 py-8 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] min-h-[500px] pb-24">
+    
+    <!-- Badge -->
+    <div class="flex justify-between items-start mb-4">
+        <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full {% if scan.disease.name == 'Healthy' %}bg-green-50 text-green-600 border-green-100{% else %}bg-red-50 text-red-500 border-red-100{% endif %} font-bold text-xs uppercase tracking-wider border">
+            <span class="w-2 h-2 rounded-full {% if scan.disease.name == 'Healthy' %}bg-green-500{% else %}bg-red-500 animate-pulse{% endif %}"></span>
+            {% if scan.disease.name == 'Healthy' %}All Good{% else %}Issue Detected{% endif %}
+        </span>
+        <div class="flex gap-2">
+             <button id="share-btn" class="w-10 h-10 rounded-full bg-slate-50 text-deep-moss flex items-center justify-center hover:bg-slate-100 transition-colors" title="Share Diagnosis">
+                <span class="material-symbols-outlined">share</span>
+             </button>
+             <button id="bookmark-btn" class="w-10 h-10 rounded-full {% if scan.is_favorite %}bg-deep-moss text-white{% else %}bg-slate-50 text-deep-moss{% endif %} flex items-center justify-center hover:bg-slate-100 hover:text-deep-moss transition-colors" title="Bookmark Result">
+                <span class="material-symbols-outlined">{% if scan.is_favorite %}bookmark_added{% else %}bookmark{% endif %}</span>
+             </button>
+        </div>
+    </div>
+    
+    <h1 class="text-4xl font-black text-deep-moss mb-2 leading-tight">{{ scan.disease.name }}</h1>
+    <p class="text-soil-grey font-medium text-lg mb-8 flex items-center gap-2">
+        Confidence Level: <span class="text-deep-moss font-bold bg-deep-moss/10 px-2 py-0.5 rounded-md">{{ scan.confidence|floatformat:0 }}% Match</span>
+    </p>
+
+    <!-- Tabs -->
+    <div class="flex border-b border-slate-200 mb-8 overflow-x-auto no-scrollbar">
+        <button onclick="switchTab('immediate')" id="tab-immediate" class="tab-btn flex-1 pb-4 border-b-2 border-deep-moss text-deep-moss font-bold text-sm uppercase tracking-wide min-w-max px-4">Immediate</button>
+        <button onclick="switchTab('longterm')" id="tab-longterm" class="tab-btn flex-1 pb-4 border-b-2 border-transparent text-slate-400 font-bold text-sm uppercase tracking-wide hover:text-deep-moss transition-colors min-w-max px-4">Long Term</button>
+        <button onclick="switchTab('products')" id="tab-products" class="tab-btn flex-1 pb-4 border-b-2 border-transparent text-slate-400 font-bold text-sm uppercase tracking-wide hover:text-deep-moss transition-colors min-w-max px-4">Products</button>
+    </div>
+
+    <!-- Content: Immediate -->
+    <div id="content-immediate" class="tab-content block animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <h3 class="text-xl font-bold text-deep-moss mb-4">Action Plan</h3>
+        <div class="text-soil-grey text-base leading-relaxed">
+            {{ scan.disease.immediate_action|linebreaks }}
+        </div>
+    </div>
+
+    <!-- Content: Long Term -->
+    <div id="content-longterm" class="tab-content hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+         <h3 class="text-xl font-bold text-deep-moss mb-4">Prevention & Care</h3>
+         <div class="text-soil-grey text-base leading-relaxed">
+            {{ scan.disease.long_term_care|linebreaks }}
+        </div>
+    </div>
+
+    <!-- Content: Products -->
+    <div id="content-products" class="tab-content hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <h3 class="text-xl font-bold text-deep-moss mb-4">Recommended Products</h3>
+        <div class="flex flex-col gap-4">
+            {% for product in scan.disease.recommended_products %}
+            <div class="flex gap-4 items-center p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
+                <div class="w-20 h-20 rounded-xl bg-slate-100 flex items-center justify-center text-slate-300">
+                    <span class="material-symbols-outlined text-4xl">inventory_2</span>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-bold text-deep-moss">{{ product.name }}</h4>
+                    <p class="text-xs text-soil-grey mb-2">{{ product.description }}</p>
+                    <span class="text-deep-moss font-bold">{{ product.price }}</span>
+                </div>
+                <a href="https://www.google.com/search?tbm=shop&q={{ product.search_term|default:product.name|urlencode }}" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-sunlight-glow text-deep-moss flex items-center justify-center hover:bg-sunlight-glow/90 shadow-md transition-transform active:scale-95" title="Buy on Google Shopping">
+                    <span class="material-symbols-outlined">shopping_bag</span>
+                </a>
+            </div>
+            {% empty %}
+            <p class="text-soil-grey">No specific products recommended for this condition.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Sticky Bottom CTA -->
+    <div class="fixed bottom-6 left-6 right-6">
+        <a href="{% url 'diagnose:dashboard' %}" class="w-full inline-block text-center py-4 rounded-xl bg-deep-moss text-white font-bold text-lg shadow-xl shadow-deep-moss/30 hover:bg-deep-moss/90 transition-all active:scale-95">
+            Back to My Garden
+        </a>
+    </div>
+
+</div>
+
+<script>
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('block'));
+        
+        const selectedContent = document.getElementById('content-' + tabName);
+        selectedContent.classList.remove('hidden');
+        selectedContent.classList.add('block');
+
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('border-deep-moss', 'text-deep-moss');
+            btn.classList.add('border-transparent', 'text-slate-400');
+        });
+
+        const selectedBtn = document.getElementById('tab-' + tabName);
+        selectedBtn.classList.remove('border-transparent', 'text-slate-400');
+        selectedBtn.classList.add('border-deep-moss', 'text-deep-moss');
+    }
+
+    // Share Button Logic
+    document.getElementById('share-btn').addEventListener('click', async () => {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'Plant Doctor Diagnosis',
+                    text: 'Check out the diagnosis for my plant: {{ scan.disease.name }}',
+                    url: window.location.href
+                });
+            } catch (err) {
+                console.log('Error sharing:', err);
+            }
+        } else {
+            navigator.clipboard.writeText(window.location.href);
+            alert('Link copied to clipboard!');
+        }
+    });
+
+    // Bookmark Button Logic
+    document.getElementById('bookmark-btn').addEventListener('click', async function() {
+        const btn = this;
+        const icon = btn.querySelector('span');
+        
+        try {
+            const response = await fetch("{% url 'diagnose:toggle_favorite' scan.id %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            });
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                if (data.is_favorite) {
+                    btn.classList.remove('bg-slate-50', 'text-deep-moss');
+                    btn.classList.add('bg-deep-moss', 'text-white');
+                    icon.innerText = 'bookmark_added';
+                } else {
+                    btn.classList.remove('bg-deep-moss', 'text-white');
+                    btn.classList.add('bg-slate-50', 'text-deep-moss');
+                    icon.innerText = 'bookmark';
+                }
+            }
+        } catch (error) {
+            console.error('Error toggling favorite:', error);
+        }
+    });
+</script>
+{% endblock %}
