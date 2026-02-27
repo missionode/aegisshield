@@ -20,9 +20,27 @@ NC='\033[0m'
 # Dynamic Root (Parent of the script)
 SHIELD_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+# Global Virtual Environment Context
+if [ -f "venv/bin/activate" ]; then
+    source venv/bin/activate
+fi
+
 setup_environment() {
     mkdir -p "$LOG_DIR" "$DATASET_DIR" "$WIKI_DIR"
     touch "$LOG_FILE"
+    
+    # Bootstrap Virtual Environment
+    if [ ! -d "venv" ]; then
+        echo -e "${YELLOW}Bootstrapping Python Virtual Environment...${NC}"
+        python3 -m venv venv
+        source venv/bin/activate
+        pip install --upgrade pip
+        if [ -f "requirements.txt" ]; then
+            pip install -r requirements.txt
+        fi
+        echo -e "${GREEN}Virtual Environment Ready.${NC}"
+    fi
+
     python3 node_manager.py init "$SHIELD_ROOT"
 }
 
@@ -63,7 +81,7 @@ run_daemon() {
         # Periodic tasks
         ((count++))
         [ $((count % 50)) -eq 0 ] && python3 wiki_updater.py >> "$LOG_FILE" 2>&1
-        [ $((count % 100)) -eq 0 ] && { python3 summary_generator.py >> "$LOG_FILE" 2>&1; python3 garbage_collector.py >> "$LOG_FILE" 2>&1; }
+        [ $((count % 100)) -eq 0 ] && { python3 summary_generator.py >> "$LOG_FILE" 2>&1; python3 garbage_collector.py >> "$LOG_FILE" 2>&1; python3 slm_scavenger.py >> "$LOG_FILE" 2>&1; }
         
         sleep 3600 # Wait 1 hour in daemon loop (C2 interval)
     done
@@ -79,6 +97,7 @@ run_all_nodes_analysis() {
             python3 slm_engine.py "$node" >> "$LOG_FILE" 2>&1
         fi
     done
+    python3 slm_av.py --scan >> "$LOG_FILE" 2>&1
     python3 fix_list_generator.py >> "$LOG_FILE" 2>&1
 }
 
@@ -149,7 +168,7 @@ case "$1" in
         else echo -e "${RED}AegisShield is OFFLINE.${NC}"; fi
         ;;
     dashboard) bootstrap_all; ./dashboard.sh ;;
-    add-node) python3 node_manager.py add "$2" ;;
+    add-node) python3 node_manager.py add "${@:2}" ;;
     run-analysis) run_all_nodes_analysis; echo -e "${GREEN}C2 Scan Complete.${NC}" ;;
     fix-list) python3 fix_list_generator.py ;;
     update-wiki) python3 wiki_updater.py ;;

@@ -30,8 +30,17 @@ echo "0 0 * * * cd $SHIELD_PATH && ./shield.sh update-wiki >> logs/aegis.log 2>&
 echo "0 */6 * * * cd $SHIELD_PATH && ./shield.sh run-analysis >> logs/aegis.log 2>&1" >> "$CRON_TEMP"
 
 # Reporting: Generate Daily Summary and Fix List at 9:00 AM
-echo "0 9 * * * cd $SHIELD_PATH && python3 summary_generator.py >> logs/summary.log 2>&1" >> "$CRON_TEMP"
-echo "0 9 * * * cd $SHIELD_PATH && python3 fix_list_generator.py >> logs/aegis.log 2>&1" >> "$CRON_TEMP"
+echo "0 9 * * * cd $SHIELD_PATH && $SHIELD_PATH/venv/bin/python3 summary_generator.py >> logs/summary.log 2>&1" >> "$CRON_TEMP"
+echo "0 9 * * * cd $SHIELD_PATH && $SHIELD_PATH/venv/bin/python3 fix_list_generator.py >> logs/aegis.log 2>&1" >> "$CRON_TEMP"
+
+# Maintenance: Run SLM Scavenger weekly on Sunday at 3:00 AM
+echo "0 3 * * 0 cd $SHIELD_PATH && $SHIELD_PATH/venv/bin/python3 slm_scavenger.py >> logs/story.log 2>&1" >> "$CRON_TEMP"
+
+# Anti-Virus: Daily AV Signature Updates (2:00 AM)
+echo "0 2 * * * cd $SHIELD_PATH && $SHIELD_PATH/venv/bin/python3 slm_av.py --update-signatures >> logs/story.log 2>&1" >> "$CRON_TEMP"
+
+# Anti-Virus: Periodic AV Scans (Every 3 hours)
+echo "0 */3 * * * cd $SHIELD_PATH && $SHIELD_PATH/venv/bin/python3 slm_av.py --scan >> logs/story.log 2>&1" >> "$CRON_TEMP"
 
 # 4. Install the new crontab
 crontab "$CRON_TEMP"

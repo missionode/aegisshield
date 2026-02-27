@@ -1,38 +1,57 @@
 # 🛡️ AegisShield: Universal AI Security Controller (C2)
 
-**AegisShield** is a professional-grade, autonomous security framework. It evolves your server from a passive target into a **Thinking, Deceptive Fortress**. By combining local Small Language Models (SLM) with active network countermeasures, it identifies, traps, and neutralizes threats across multiple projects simultaneously.
+**AegisShield** is a professional-grade, **Predictive Autonomous Security Defender**. It evolves your server from a passive target into a **Thinking, Deceptive Fortress**. By combining local Small Language Models (SLM) with active network countermeasures, it identifies, traps, and neutralizes threats across multiple projects simultaneously.
 
 ---
 
-## 🏗️ The C2 (Command & Control) Architecture
+## 🏗️ Core Architecture & Modules
 
-### 🤖 Semantic Intelligence (v4.0)
-AegisShield doesn't just match patterns—it understands logic using a local Small Language Model (SLM) ecosystem.
+### 1. Semantic Intelligence (v4.0 SOC HUD)
+The centralized command center for real-time monitoring. AegisShield doesn't just match patterns—it understands logic using a local Small Language Model (SLM) ecosystem.
 - **Intellectual SOC Analyst:** Evaluates web traffic intents strictly against advanced OWASP Top 10 and MITRE ATT&CK hacking methodologies, providing narrative defense theories.
 - **Semantic Payload Inspection (AI WAF):** A 100% safe, background AI Web Application Firewall that queue-reads suspicious payloads to catch obfuscated zero-days that regex rules miss.
-- **Self-Healing Code with Scanner Memory:** The AI autonomously re-writes dangerous code in a sandbox (Digital Twin). It mathematically memorizes previously hardened snippets so it skips re-processing them in the future.
+- **Semantic SLM Anti-Virus & Active Quarantine:** Real-time localized file scanning that leverages SLM-generated research signatures and deep semantic verification. Upon definitive malware detection, AegisShield automatically neutralizes and moves the threat to a secure `quarantine/` folder. This physical file-system quarantine is **100% tech-stack independent** and works identically whether the malicious script is PHP, Python, Node, Bash, or Perl.
 - **Autonomous Threat Intel:** Pulls official CISA RSA advisories and generates proactive "Ethical Pen-Testing Strategies" to your local wiki.
-- **Secure SLM Upgrades:** Before updating the local TinyLlama model, the C2 daemon checks HuggingFace API compatibility, blocking architectural changes that risk stability and pushing manual alerts to the HUD.
+- **Secure Auto-Upgrades:** Before updating the local TinyLlama model, the C2 daemon checks HuggingFace API compatibility, blocking architectural changes that risk stability and pushing manual alerts to the HUD.
 
-### 🎭 Morphing Deception
+### 2. PAS (Predictive Active Shielding)
+The "Response Engine" powered by the local SLM.
+- **Autonomous Self-Healing:** The AI re-writes dangerous code in a sandboxed Digital Twin, tests the context, and verifies the solution before reporting it.
+- **Logic Sentinel & Scanner Memory:** Deep semantic review of source code logic. To optimize performance, the scanner mathematically memorizes previously hardened snippets so it instantly ignores them during future scans, saving zero-day compute power.
+
+### 3. Adaptive Cyber Deception (Morphing Defense)
 Mislead attackers by dynamically changing your server's fingerprint.
 - **The Masquerade:** Automatically detects your underlying tech stack and alters HTTP headers to masquerade as a different legacy server (e.g., BlackBerry BES), frustrating automated enumeration tools.
-- **Ghost Tripwires:** Opens non-responsive, high-value ports (FTP, RDP) as silent alarms. Any connection attempt triggers an immediate kernel-level IP quarantine via iptables.
+- **Ghost Tripwires:** Dynamically opens high-value ghost ports (FTP, RDP) that act as silent alarms.
+- **Immediate IP Quarantine:** Automatically "black-holes" any IP that touches a deception trap using kernel-level firewall rules.
 
-### 🕸️ Active Tarpitting & Anti-DDoS
-Exhaust attacker resources and mitigate floods before they impact application performance.
-- **Active Tarpitting:** AegisShield actively holds suspicious connections open for extended periods (15s+), intentionally slowing down scanners and brute-force bots to a crawl.
-- **Dynamic Rate Limiting:** Monitors hits in real-time and scales defenses during high-volume DDoS attacks.
+### 4. Continuous Threat Intelligence & Ethical Hacking
+Your C2 daemon connects locally to authoritative global feeds.
+- **CISA RSS Sync:** Running `update-wiki` asynchronously fetches the latest Cybersecurity Advisories directly from CISA.
+- **AI Wiki Generation:** For each new threat, the intellectual AI formats a new `.md` Wiki entry encompassing a Threat Overview, Prevention steps, and autonomously generates an **Ethical Pen-Testing Strategy**.
+
+### 5. Active Tarpitting & Anti-DDoS
+Active, resource-exhaustion defense at the network layer.
+- **Active Tarpitting:** Slows down suspicious IPs by holding connections open for extended periods (15 seconds or more) to exhaust attacker resources and break automated scanners.
+- **Active Blocking:** Kernel-level firewall drops for aggressive, high-volume DDoS bursts.
 
 ---
 
-## 🚀 Deployment
+## 🚀 Deployment & Operation
 
-Launch the full-screen Security HUD:
+Launch the full-screen Security HUD. On first start, AegisShield will automatically build an isolated Python virtual environment (`venv`) and install all required ML dependencies (`torch`, `transformers`) so it doesn't conflict with your OS.
 
 ```bash
 cd aegisshield
 ./shield.sh dashboard
+```
+
+If you need to run specific `.py` files manually or interact with the Python environment directly, you should activate the virtual environment first:
+
+```bash
+cd aegisshield
+source venv/bin/activate
+# Now you can run commands like: python3 hit_monitor.py
 ```
 
 ### 📋 Consolidated Actionable Intelligence: `FIX_LIST.md`
@@ -41,11 +60,17 @@ A master checklist generated in your project root, providing:
 - **AI-Generated Fixes:** Direct code rewrites for logic flaws.
 - **Multi-Node Coverage:** A single report for every directory under AegisShield protection.
 
+### 🧹 Autonomous Garbage Collection
+Ensures the system remains lightweight and sustainable:
+- **Log Rotation:** Automatically truncates logs if the folder exceeds size thresholds.
+- **Digital Twin Grooming:** Purges temporary artifacts to save disk space after scans complete.
+- **SLM Tech-Stack Scavenger:** Analyzes your project's technology stack to dynamically identify and autonomously clean up temporary files, caches, or build artifacts (`.pyc`, `node_modules`).
+
 ---
 
 ## 🛠️ Management CLI Reference
 
-Control the multi-node background daemon and trigger specific actions:
+Control the multi-node background daemon and trigger specific actions via `shield.sh`:
 
 | Command | Description |
 | :--- | :--- |

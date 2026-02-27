@@ -25,23 +25,31 @@ def initialize_nodes(default_root):
     else:
         log_story("C2 Registry loaded. Ready to protect multiple nodes.")
 
-def add_node(path):
-    abs_path = os.path.abspath(path)
-    if not os.path.exists(abs_path):
-        print(f"Error: Path {path} does not exist.")
-        return
-    
-    with open(NODES_FILE, "r") as f:
-        nodes = json.load(f)
-    
-    if abs_path not in nodes:
-        nodes.append(abs_path)
+def add_nodes(paths):
+    if not os.path.exists(NODES_FILE):
+        nodes = []
+    else:
+        with open(NODES_FILE, "r") as f:
+            nodes = json.load(f)
+            
+    added_count = 0
+    for path in paths:
+        abs_path = os.path.abspath(path)
+        if not os.path.exists(abs_path):
+            print(f"Error: Path {path} does not exist.")
+            continue
+        
+        if abs_path not in nodes:
+            nodes.append(abs_path)
+            log_story(f"Added new node to protection registry: {abs_path}")
+            print(f"Node added: {abs_path}")
+            added_count += 1
+        else:
+            print(f"Node already registered: {abs_path}")
+            
+    if added_count > 0:
         with open(NODES_FILE, "w") as f:
             json.dump(nodes, f, indent=4)
-        log_story(f"Added new node to protection registry: {abs_path}")
-        print(f"Node added: {abs_path}")
-    else:
-        print("Node already registered.")
 
 def get_nodes():
     if not os.path.exists(NODES_FILE): return []
@@ -50,7 +58,7 @@ def get_nodes():
 
 if __name__ == "__main__":
     if len(sys.argv) > 2 and sys.argv[1] == "add":
-        add_node(sys.argv[2])
+        add_nodes(sys.argv[2:])
     elif len(sys.argv) > 1 and sys.argv[1] == "init":
         initialize_nodes(sys.argv[2] if len(sys.argv) > 2 else "..")
     elif len(sys.argv) > 1 and sys.argv[1] == "list":

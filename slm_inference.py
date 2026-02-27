@@ -130,5 +130,60 @@ Is this attempting to exploit a vulnerability (like obfuscated SQLi, XSS, or Dir
         if "MALICIOUS" in response: return "MALICIOUS"
         return "SAFE"
 
+    def get_junk_patterns(self, tech_stack):
+        prompt = f"""### System: You are AegisShield, a system optimization AI.
+### User: I am analyzing a project with the following tech stack: "{tech_stack}".
+Identify up to 5 common temporary, cache, or build artifact file extensions or directory names that can be safely deleted to save space (e.g. .pyc, node_modules, __pycache__).
+Provide the result ONLY as a JSON list of strings, like [".pyc", "__pycache__"].
+### Assistant:"""
+        outputs = self.pipe(prompt, max_new_tokens=100, do_sample=True, temperature=0.1)
+        raw_output = self.clean_output(outputs[0]["generated_text"])
+        try:
+            # Extract list from JSON output
+            import json
+            import re
+            match = re.search(r'\[(.*?)\]', raw_output, re.DOTALL)
+            if match:
+                patterns = json.loads(f'[{match.group(1)}]')
+                return [p for p in patterns if isinstance(p, str) and len(p) > 1]
+        except Exception:
+            pass
+        # Fallback patterns if SLM fails to generate proper JSON
+        return [".pyc", "__pycache__", ".log.bak", "tmp", "temp"]
+
+    def generate_av_signatures(self, tech_stack):
+        prompt = f"""### System: You are AegisShield, a malware analysis AI.
+### User: Generate 3 specific file names, extensions, or code snippets (signatures) commonly associated with modern malware, webshells, or backdoors targeting a "{tech_stack}" stack.
+Provide the result ONLY as a JSON list of strings, like ["b374k.php", "eval(base64_decode(", ".sh.x"].
+### Assistant:"""
+        outputs = self.pipe(prompt, max_new_tokens=150, do_sample=True, temperature=0.2)
+        raw_output = self.clean_output(outputs[0]["generated_text"])
+        try:
+            import json
+            import re
+            match = re.search(r'\[(.*?)\]', raw_output, re.DOTALL)
+            if match:
+                patterns = json.loads(f'[{match.group(1)}]')
+                return [p for p in patterns if isinstance(p, str) and len(p) > 2]
+        except Exception:
+            pass
+        # Fallbacks
+        return ["eval(", "base64_decode", "system(", "exec(", "shell_exec", "passthru", ".locked", "miner"]
+
+    def analyze_suspicious_file(self, file_content):
+        # Truncate content to avoid token limit
+        snippet = file_content[:1500] if len(file_content) > 1500 else file_content
+        prompt = f"""### System: You are AegisShield, an expert malware reverse-engineer.
+### User: Analyze the following file content snippet:
+```
+{snippet}
+```
+Is this definitively a malicious script (like a webshell, backdoor, or ransomware)? Reply with exactly one word: "MALICIOUS" or "SAFE".
+### Assistant:"""
+        outputs = self.pipe(prompt, max_new_tokens=10, do_sample=False, temperature=0.0)
+        response = self.clean_output(outputs[0]["generated_text"]).upper()
+        if "MALICIOUS" in response: return "MALICIOUS"
+        return "SAFE"
+
 if __name__ == "__main__":
     print("SLM_READY")

@@ -16,7 +16,7 @@ PID_FILE="aegis.pid"
 # Colors
 GREEN='\033[0;32m'
 RED='\033[0;31m'
-BLINK_RED='\033[5;31m'
+ALERT_RED='\033[1;31m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 CYAN='\033[0;36m'
@@ -70,7 +70,7 @@ draw_ui() {
         RESOLVED=${RESOLVED:-0}
         
         # Check explicit sub-daemons
-        local SOC_STATUS="${BLINK_RED}OFFLINE${NC}"; [ -f "monitor.pid" ] && ps -p $(cat "monitor.pid") > /dev/null 2>&1 && SOC_STATUS="${GREEN}ACTIVE${NC}"
+        local SOC_STATUS="${ALERT_RED}OFFLINE${NC}"; [ -f "monitor.pid" ] && ps -p $(cat "monitor.pid") > /dev/null 2>&1 && SOC_STATUS="${GREEN}ACTIVE${NC}"
         local PAS_STATUS="${GREEN}ENABLED${NC}"
         local TRAP_STATUS="${GREEN}READY${NC}"
         
@@ -122,14 +122,14 @@ draw_ui() {
         
         # 1. Action Required: Fix List Pending Items
         if [ "$PENDING" -gt 0 ]; then
-            print_line "$YELLOW" "┃ ${BLINK_RED}🚨 ACTION REQUIRED:${NC}${YELLOW} $PENDING unresolved vulnerabilities require your attention in FIX_LIST.md${NC}"
+            print_line "$YELLOW" "┃ ${ALERT_RED}🚨 ACTION REQUIRED:${NC}${YELLOW} $PENDING unresolved vulnerabilities require your attention in FIX_LIST.md${NC}"
             ALERTS_DISPLAYED=true
         fi
         
         # 2. Active Engagement: Tarpit / Blackhole
         if [ -f "$STORY_LOG" ]; then
             if tail -n 50 "$STORY_LOG" | grep -Eiq "Tarpit Action|Black-holing"; then
-                print_line "$YELLOW" "┃ ${BLINK_RED}⚡ ACTIVE ENGAGEMENT:${NC}${YELLOW} Network Shield is currently suppressing hostile IP(s).${NC}"
+                print_line "$YELLOW" "┃ ${ALERT_RED}⚡ ACTIVE ENGAGEMENT:${NC}${YELLOW} Network Shield is currently suppressing hostile IP(s).${NC}"
                 ALERTS_DISPLAYED=true
             fi
         fi
@@ -137,7 +137,7 @@ draw_ui() {
         # 3. Trap Triggered: Deception Network
         if [ -f "$HITS_LOG" ]; then
             if tail -n 50 "$HITS_LOG" | grep -iq "Honey-Endpoint Triggered"; then
-                print_line "$YELLOW" "┃ ${BLINK_RED}🕸️ TRAP TRIGGERED:${NC}${YELLOW} The Morphing Deception network has engaged an intruder!${NC}"
+                print_line "$YELLOW" "┃ ${ALERT_RED}🕸️ TRAP TRIGGERED:${NC}${YELLOW} The Morphing Deception network has engaged an intruder!${NC}"
                 ALERTS_DISPLAYED=true
             fi
         fi
@@ -149,7 +149,7 @@ draw_ui() {
         # Check for SLM Manual Upgrade Requirements
         if [ -f "logs/slm_status.json" ]; then
             if grep -q '"MANUAL_UPGRADE_REQ": true' "logs/slm_status.json"; then
-                print_line "$YELLOW" "┃ ${BLINK_RED}[!] SYSTEM ALERT:${NC}${YELLOW} New SLM Version Detected. Manual Review Required for Stability.${NC}"
+                print_line "$YELLOW" "┃ ${ALERT_RED}[!] SYSTEM ALERT:${NC}${YELLOW} New SLM Version Detected. Manual Review Required for Stability.${NC}"
             fi
         fi
     else
