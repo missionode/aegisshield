@@ -46,7 +46,7 @@ draw_ui() {
     local AVAIL_LINES=$(( LINES - 16 ))
     [ $AVAIL_LINES -lt 9 ] && AVAIL_LINES=9 # Minimum fallback
     
-    local STORY_H=$(( AVAIL_LINES * 40 / 100 ))
+    local STORY_H=3
     local SUMM_H=$(( AVAIL_LINES * 40 / 100 ))
     local TRAFF_H=$(( AVAIL_LINES - STORY_H - SUMM_H ))
 
