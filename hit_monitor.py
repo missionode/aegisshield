@@ -16,6 +16,7 @@ BRUTE_FORCE_THRESHOLD = 5
 ip_hit_history = defaultdict(list)
 seen_active_conns = set()
 traffic_batch = [] # Buffer for SLM Second Opinion
+waf_queue = [] # Queue for Semantic Payload Inspection
 
 def log_story(message):
     timestamp = datetime.now().strftime("%H:%M:%S")
@@ -74,7 +75,38 @@ def analyze_intent(ip, method, path, user_agent):
     if any(agent in user_agent for agent in bot_agents):
         return "BOT"
 
+    # Suspicious Characters that might be obfuscated attacks
+    suspicious_chars = ["%", "<", ">", "{", "}", "$", "(", ")", ";"]
+    if any(char in path for char in suspicious_chars):
+        return "SUSPICIOUS"
+
     return "BENIGN"
+
+def ai_waf_thread():
+    """Background thread: Semantically inspects queued suspicious payloads."""
+    slm = None
+    while True:
+        if len(waf_queue) == 0:
+            time.sleep(2)
+            continue
+            
+        try:
+            if slm is None: slm = AegisSLM()
+            
+            # Pop the oldest suspicious request
+            req = waf_queue.pop(0)
+            log_story(f"AI WAF Inspecting suspicious payload from {req['ip']}...")
+            
+            verdict = slm.inspect_payload(req['path'])
+            
+            if verdict == "MALICIOUS":
+                log_hit(req['ip'], req['method'], req['path'], req['user_agent'], "MALICIOUS/AI_WAF_BLOCK")
+                # Immediate IP block logic could go here
+            else:
+                log_story(f"AI WAF cleared payload from {req['ip']}: SAFE")
+                
+        except Exception as e:
+            time.sleep(5)
 
 def slm_behavioral_review():
     """Background thread: Periodically asks SLM for a 'Second Opinion' on traffic patterns."""
@@ -141,6 +173,10 @@ def tail_web_log():
                     path = parts[6]
                     user_agent = line.split('"')[-2] if '"' in line else "Web-Browser"
                     intent = analyze_intent(ip, method, path, user_agent)
+                    if intent == "SUSPICIOUS":
+                        waf_queue.append({
+                            "ip": ip, "method": method, "path": path, "user_agent": user_agent
+                        })
                     log_hit(ip, method, path, user_agent, intent)
             except: pass
 
@@ -150,4 +186,5 @@ if __name__ == "__main__":
     
     threading.Thread(target=active_network_monitor, daemon=True).start()
     threading.Thread(target=slm_behavioral_review, daemon=True).start()
+    threading.Thread(target=ai_waf_thread, daemon=True).start()
     tail_web_log()

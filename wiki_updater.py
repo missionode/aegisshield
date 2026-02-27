@@ -48,13 +48,17 @@ def update_wiki():
     try:
         from slm_inference import AegisSLM
         slm = AegisSLM()
-        prompt = f"### System: You are AegisShield, an AI security expert. Format the following threat into a standard Wiki Markdown article with a '🛡️ Threat Overview' and '🛠️ Prevention' section.\n### User: Threat: {title}. Details: {desc}\n### Assistant:"
+        prompt = f"""### System: You are AegisShield, an intellectual and highly efficient Ethical Hacker. 
+You are analyzing a new threat to update the local security knowledge base.
+Format the following threat into a Wiki Markdown article with three sections: '🛡️ Threat Overview', '🛠️ Prevention', and '🎯 Ethical Pen-Testing Strategy' (suggesting safe, ethical methods to test if our local system is vulnerable).
+### User: Threat: {title}. Details: {desc}
+### Assistant:"""
         # We access the pipeline directly for a custom prompt format
-        outputs = slm.pipe(prompt, max_new_tokens=150, do_sample=True, temperature=0.5)
+        outputs = slm.pipe(prompt, max_new_tokens=250, do_sample=True, temperature=0.5)
         formatted_content = outputs[0]["generated_text"].split("### Assistant:")[1].strip()
     except Exception as e:
         # Fallback if SLM fails to load
-        formatted_content = f"# {title}\n\n### 🛡️ Threat Overview\n{desc}\n\n### 🛠️ Prevention\n- Monitor system logs.\n- Apply latest patches.\n- Ensure strict access controls."
+        formatted_content = f"# {title}\n\n### 🛡️ Threat Overview\n{desc}\n\n### 🛠️ Prevention\n- Monitor system logs.\n- Apply latest patches.\n\n### 🎯 Ethical Pen-Testing Strategy\n- Run authenticated vulnerability scans.\n- Conduct secure code review."
 
     # Generate a safe filename
     filename = "".join([c for c in title if c.isalpha() or c.isdigit() or c==' ']).rstrip()

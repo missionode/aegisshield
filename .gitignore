@@ -10,3 +10,4 @@ logs/*.json
 dataset/
 node_modules/
 .env
+digital_twin/
