@@ -3,6 +3,10 @@
 # AegisShield High-Stability HUD
 # Prevents text bleeding and duplication via strict line control.
 
+if [ -f "venv/bin/activate" ]; then
+    source venv/bin/activate
+fi
+
 HITS_LOG="logs/hits.log"
 STORY_LOG="logs/story.log"
 SUMMARY_LOG="logs/summary.log"
@@ -99,6 +103,48 @@ draw_ui() {
         local SPIN_IDX=$(( $(date +%s) % 4 ))
         
         print_line "$NC" "┃ 📊 System Integrity: [${BAR_COLOR}${FILLED_BAR}${EMPTY_BAR}${NC}] ${HEALTH_PCT}% | Scan Pulse ${SPINNER[$SPIN_IDX]}"
+        
+        # Quarantine Metric
+        if [ -f "logs/quarantine_tracker.json" ]; then
+            local Q_DATE=$(grep -Eo '"date": "[^"]*"' logs/quarantine_tracker.json | cut -d'"' -f4)
+            local Q_COUNT=$(grep -Eo '"deleted_today": [0-9]+' logs/quarantine_tracker.json | grep -Eo '[0-9]+')
+            if [ "$Q_DATE" == "$(date '+%Y-%m-%d')" ] && [ -n "$Q_COUNT" ] && [ "$Q_COUNT" -gt 0 ]; then
+                print_line "$GREEN" "┃ 🗑️  Auto-Cleaned: ${YELLOW}${Q_COUNT} Quarantined Threat(s)${GREEN} (Past 24h) ${NC}"
+            else
+                print_line "$NC" "┃ 🗑️  Auto-Cleaned: 0 Quarantined Threats (Past 24h)"
+            fi
+        else
+            print_line "$NC" "┃ 🗑️  Auto-Cleaned: 0 Quarantined Threats (Past 24h)"
+        fi
+        
+        # Actionable Alerts (Proactive Notifications)
+        local ALERTS_DISPLAYED=false
+        
+        # 1. Action Required: Fix List Pending Items
+        if [ "$PENDING" -gt 0 ]; then
+            print_line "$YELLOW" "┃ ${BLINK_RED}🚨 ACTION REQUIRED:${NC}${YELLOW} $PENDING unresolved vulnerabilities require your attention in FIX_LIST.md${NC}"
+            ALERTS_DISPLAYED=true
+        fi
+        
+        # 2. Active Engagement: Tarpit / Blackhole
+        if [ -f "$STORY_LOG" ]; then
+            if tail -n 50 "$STORY_LOG" | grep -Eiq "Tarpit Action|Black-holing"; then
+                print_line "$YELLOW" "┃ ${BLINK_RED}⚡ ACTIVE ENGAGEMENT:${NC}${YELLOW} Network Shield is currently suppressing hostile IP(s).${NC}"
+                ALERTS_DISPLAYED=true
+            fi
+        fi
+        
+        # 3. Trap Triggered: Deception Network
+        if [ -f "$HITS_LOG" ]; then
+            if tail -n 50 "$HITS_LOG" | grep -iq "Honey-Endpoint Triggered"; then
+                print_line "$YELLOW" "┃ ${BLINK_RED}🕸️ TRAP TRIGGERED:${NC}${YELLOW} The Morphing Deception network has engaged an intruder!${NC}"
+                ALERTS_DISPLAYED=true
+            fi
+        fi
+        
+        if [ "$ALERTS_DISPLAYED" = false ]; then
+            print_line "$GREEN" "┃ ✅ System is secure. No immediate actions required."
+        fi
         
         # Check for SLM Manual Upgrade Requirements
         if [ -f "logs/slm_status.json" ]; then
