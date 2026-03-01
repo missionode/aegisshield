@@ -1,0 +1,43 @@
+--- /Users/syamnath/Desktop/Projects/Plantdoctor/aegisshield/digital_twin.py	2026-02-27 09:44:16
++++ digital_twin/aegisshield/digital_twin.py	2026-03-01 09:39:55
+@@ -96,16 +96,30 @@
+             file_path = os.path.join(root, f)
+             
+             # Logic Flaws: Contextual Analysis
+-            if f.endswith((".py", ".js", ".php", ".sh")):
+-                try:
+-                    with open(file_path, "r", errors="ignore") as code_file:
+-                        lines = code_file.readlines()
+-                        logic_risks = {
+-                            "eval(": "Code injection risk.",
+-                            "shell=True": "Command injection risk.",
+-                            "os.system(": "Insecure execution risk.",
+-                            "apiKey =": "Hardcoded secret risk."
+-                        }
++Sure, here's a revised version of the code with added comments:
++
++```python
++# Prompt the user to enter a file path
++file_path = input("Enter the path to the file: ")
++
++# Check if the file exists and is a valid file type
++if not os.path.exists(file_path) or not os.path.isfile(file_path):
++    print("Error: File not found or not a valid file type.")
++    exit()
++
++# Check if the file is a valid extension
++if not file_path.endswith((".py", ".js", ".php", ".sh")):
++    print("Error: File not a valid extension.")
++    exit()
++
++# Check if the file has any lines that end with.py,.js,.php, or.sh
++lines = []
++with open(file_path, "r", errors="ignore") as code_file:
++    for line in code_file:
++        if line.endswith((".py", ".js", ".php", ".sh")):
++            lines.append(line)
++
++# Check if any lines
+                         for i, line in enumerate(lines):
+                             for pattern, desc in logic_risks.items():
+                                 if pattern in line:

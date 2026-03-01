@@ -24,13 +24,14 @@ def sync_twin(root_dir):
         os.makedirs(TWIN_DIR)
     
     log_message("INFO", f"Syncing Digital Twin from {root_dir}")
-    exclude_dirs = {".git", "logs", "digital_twin", "tests", ".pytest_cache", "__pycache__", ".venv", "venv", "node_modules"}
+    # EXCLUDE FIX_LIST.md to prevent scan loops
+    exclude_dirs = {".git", "logs", "digital_twin", "tests", ".pytest_cache", "__pycache__", ".venv", "venv", "node_modules", "FIX_LIST.md"}
     
     def ignore_files(dir_name, contents):
-        return [c for c in contents if c in exclude_dirs]
+        return [c for c in contents if c in exclude_dirs or c == "FIX_LIST.md"]
 
     for item in os.listdir(root_dir):
-        if item in exclude_dirs:
+        if item in exclude_dirs or item == "FIX_LIST.md":
             continue
         s = os.path.join(root_dir, item)
         d = os.path.join(TWIN_DIR, item)
@@ -65,6 +66,7 @@ def run_real_scan(root_dir):
     
     # 2. Extract previously hardened vulnerabilities from FIX_LIST
     hardened_snippets = set()
+    # We only care about the authoritative parent FIX_LIST for skipping
     fix_lists = ["../FIX_LIST.md", "FIX_LIST.md"]
     for fl_path in fix_lists:
         try:
@@ -72,27 +74,29 @@ def run_real_scan(root_dir):
             if os.path.exists(full_path):
                 with open(full_path, "r") as f:
                     for line in f:
-                        # Format: | [X] | Vulnerability | `path` | `snippet` | Action | Context |
                         if "| [X] |" in line:
                             parts = [p.strip() for p in line.split("|")]
                             if len(parts) >= 5:
-                                # Clean the ticks around the snippet
                                 snippet = parts[4].replace("`", "").strip()
                                 hardened_snippets.add(snippet)
-        except Exception:
-            pass
+        except Exception: pass
             
     if hardened_snippets:
         log_message("INFO", f"Optimization: Loaded {len(hardened_snippets)} hardened snippets to skip.")
     
     # 3. Recursive scan
-    exclude_patterns = ["digital_twin", "logs", ".git", ".venv", "venv", "node_modules", "site-packages", "__pycache__"]
+    exclude_patterns = ["aegisshield", "digital_twin", "logs", ".git", ".venv", "venv", "node_modules", "site-packages", "__pycache__", "FIX_LIST.md"]
     
     for root, dirs, files in os.walk(root_dir):
+        # Explicitly skip digital_twin and aegisshield folders
         if any(exc in root for exc in exclude_patterns):
             continue
             
         for f in files:
+            # Skip ANY FIX_LIST file during the scan
+            if "FIX_LIST" in f:
+                continue
+                
             file_path = os.path.join(root, f)
             
             # Logic Flaws: Contextual Analysis
@@ -109,26 +113,23 @@ def run_real_scan(root_dir):
                         for i, line in enumerate(lines):
                             for pattern, desc in logic_risks.items():
                                 if pattern in line:
-                                    # Extract context block (5 lines around)
-                                    start = max(0, i - 5)
-                                    end = min(len(lines), i + 5)
+                                    start = max(0, i - 3)
+                                    end = min(len(lines), i + 3)
                                     context_block = "".join(lines[start:end])
                                     
                                     clean_snippet = line.strip()
                                     if clean_snippet in hardened_snippets:
-                                        # Optimization: Skip already verified fixes
                                         continue
                                         
                                     findings.append({
                                         "type": "LOGIC_FLAW",
-                                        "path": file_path,
+                                        "path": os.path.abspath(file_path), # Ensure absolute path
                                         "details": desc,
                                         "line": i + 1,
                                         "snippet": clean_snippet,
-                                        "block": context_block # New for Phase 19
+                                        "block": context_block 
                                     })
-                except Exception:
-                    pass
+                except Exception: pass
 
     return findings
 

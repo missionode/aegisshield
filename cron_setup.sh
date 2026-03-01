@@ -33,6 +33,9 @@ echo "0 */6 * * * cd $SHIELD_PATH && ./shield.sh run-analysis >> logs/aegis.log 
 echo "0 9 * * * cd $SHIELD_PATH && $SHIELD_PATH/venv/bin/python3 summary_generator.py >> logs/summary.log 2>&1" >> "$CRON_TEMP"
 echo "0 9 * * * cd $SHIELD_PATH && $SHIELD_PATH/venv/bin/python3 fix_list_generator.py >> logs/aegis.log 2>&1" >> "$CRON_TEMP"
 
+# Remediation: Autonomous SLM Doctor runs periodically (Every 15 minutes)
+echo "*/15 * * * * cd $SHIELD_PATH && $SHIELD_PATH/venv/bin/python3 slm_doctor.py >> logs/aegis.log 2>&1" >> "$CRON_TEMP"
+
 # Maintenance: Run SLM Scavenger weekly on Sunday at 3:00 AM
 echo "0 3 * * 0 cd $SHIELD_PATH && $SHIELD_PATH/venv/bin/python3 slm_scavenger.py >> logs/story.log 2>&1" >> "$CRON_TEMP"
 

@@ -16,7 +16,12 @@ The centralized command center for real-time monitoring. AegisShield doesn't jus
 
 ### 2. PAS (Predictive Active Shielding)
 The "Response Engine" powered by the local SLM.
-- **Autonomous Self-Healing:** The AI re-writes dangerous code in a sandboxed Digital Twin, tests the context, and verifies the solution before reporting it.
+- **Autonomous Self-Healing (SLM Doctor):** The AI re-writes dangerous code in a sandboxed Digital Twin, tests the context, and verifies the solution before deploying it to your project.
+- **Hardware-Aware Performance:** AegisShield dynamically scales based on your hardware:
+    - **NVIDIA GPU (CUDA):** High-speed inference using `float16`.
+    - **Apple Silicon (MPS):** Optimized for M1/M2/M3 chips.
+    - **CPU (Intel/AMD):** High-efficiency `bfloat16` mode with intelligent threading to prevent OS freezes.
+- **Live Stream Verification:** Watch the AI "think" and rewrite code in real-time via the console during manual sessions.
 - **Logic Sentinel & Scanner Memory:** Deep semantic review of source code logic. To optimize performance, the scanner mathematically memorizes previously hardened snippets so it instantly ignores them during future scans, saving zero-day compute power.
 
 ### 3. Adaptive Cyber Deception (Morphing Defense)

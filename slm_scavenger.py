@@ -21,6 +21,24 @@ def run_scavenger():
         return
 
     log_story(f"Starting scavenge cycle for {len(nodes)} nodes.")
+    
+    # Pre-Scavenge: Groom FIX_LIST.md globally
+    try:
+        fix_list_path = "../FIX_LIST.md"
+        if os.path.exists(fix_list_path):
+            log_story("Grooming FIX_LIST.md for stale/failed patch attempts...")
+            with open(fix_list_path, "r") as f:
+                lines = f.readlines()
+            # Remove lines that contain 'PATCH_FAILED' because they will never be picked up by the doctor again
+            # Assuming these will be handled by humans or simply cleaned out if too old.
+            new_lines = [l for l in lines if "PATCH_FAILED" not in l]
+            if len(new_lines) < len(lines):
+                 with open(fix_list_path, "w") as f:
+                      f.writelines(new_lines)
+                 log_story(f"Removed {len(lines) - len(new_lines)} stale PATCH_FAILED entries from FIX_LIST.")
+    except Exception as e:
+        log_story(f"Grooming FIX_LIST failed: {e}")
+
     slm = AegisSLM()
 
     total_freed = 0

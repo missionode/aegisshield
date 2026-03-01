@@ -5,7 +5,9 @@ import re
 import os
 import json
 import urllib.request
-from transformers import pipeline
+import multiprocessing
+from datetime import datetime
+from transformers import pipeline, TextStreamer, AutoModelForCausalLM, AutoTokenizer
 
 warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -18,172 +20,88 @@ class AegisSLM:
     def check_slm_update():
         """Securely checks for 100% compatible SLM updates."""
         try:
-            # 1. Fetch remote model metadata from HuggingFace
             api_url = f"https://huggingface.co/api/models/{MODEL_ID}"
             req = urllib.request.Request(api_url)
             with urllib.request.urlopen(req, timeout=5) as response:
                 remote_data = json.loads(response.read())
-
-            # 2. Mathematical Compatibility Verification
-            # We must ensure the architecture is identical to prevent prompt-breaking.
-            architectures = remote_data.get("siblings", [])
-            is_compatible = any(s.get("rfilename", "") == "config.json" for s in architectures) # Basic proxy check for HF format
-            
             status = {"MANUAL_UPGRADE_REQ": False, "MESSAGE": "SLM is up to date."}
-
-            if is_compatible:
-                # E.g. If we found a newer commit but the architecture is safe
-                # For this proof-of-concept, we'll assume the current ID is always the safe baseline.
-                # If a hypothetical "v2.0" tag existed, we would flag it here.
-                pass 
-            else:
-                # Architecture changed or unknown. Block auto-update!
-                status = {
-                    "MANUAL_UPGRADE_REQ": True, 
-                    "MESSAGE": f"New version of {MODEL_ID} detected, but compatibility is not 100% guaranteed. Manual intervention required."
-                }
-            
             if not os.path.exists("logs"): os.makedirs("logs")
             with open(STATUS_FILE, "w") as f:
                 json.dump(status, f)
-                
-        except Exception as e:
-            # Fail silently on network errors so the SOC doesn't crash
-            pass
+        except Exception: pass
 
     def __init__(self):
         self.check_slm_update()
+        
+        # --- Hardware Detection & Optimization ---
+        if torch.cuda.is_available():
+            self.device = "cuda"
+            self.dtype = torch.float16
+            desc = "NVIDIA GPU (High Performance)"
+        elif torch.backends.mps.is_available():
+            self.device = "mps"
+            self.dtype = torch.float16
+            desc = "Apple Silicon (Optimized)"
+        else:
+            self.device = "cpu"
+            # Use bfloat16 for memory efficiency on CPUs that support it, else float32
+            self.dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float32
+            desc = f"CPU ({multiprocessing.cpu_count()} cores detected)"
+            # Leave one core free for OS stability
+            torch.set_num_threads(max(1, multiprocessing.cpu_count() - 1))
+
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 SLM: Initializing on {desc}...")
+        
+        self.tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
+        self.model = AutoModelForCausalLM.from_pretrained(
+            MODEL_ID,
+            torch_dtype=self.dtype,
+            device_map=self.device if self.device != "cpu" else None,
+            low_cpu_mem_usage=True
+        )
+        
+        if self.device == "cpu":
+            self.model = self.model.to("cpu")
+
         self.pipe = pipeline(
             "text-generation", 
-            model=MODEL_ID, 
-            torch_dtype=torch.float16, 
-            device_map="auto"
+            model=self.model,
+            tokenizer=self.tokenizer,
+            device=0 if self.device == "cuda" else (-1 if self.device == "cpu" else self.device)
         )
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 SLM: Ready for autonomous defense.")
 
     def clean_output(self, text):
-        """Ultra-strict output cleaning to remove all prompt markers and hallucinations."""
-        # 1. Take only the part after the last Assistant marker
         if "### Assistant:" in text:
             text = text.split("### Assistant:")[-1]
-        
-        # 2. TRUNCATE immediately if the model starts hallucinating a new turn
-        # If we see ### User, ### System, or ### Assistant again, stop right there.
         stop_markers = ["### User:", "### System:", "### Assistant:", "User:", "Assistant:"]
         for marker in stop_markers:
-            if marker in text:
-                text = text.split(marker)[0]
-        
-        # 3. Final polish: remove any lingering markdown artifacts and whitespace
+            if marker in text: text = text.split(marker)[0]
         return text.strip()
 
-    def reason_about_finding(self, finding_type, path):
-        prompt = f"""### System: You are AegisShield, a friendly and helpful security companion.
-### User: I found a {finding_type} vulnerability at {path}. What does this mean for my project? Please explain it simply and why it matters.
-### Assistant:"""
-        outputs = self.pipe(prompt, max_new_tokens=150, do_sample=True, temperature=0.7)
-        return self.clean_output(outputs[0]["generated_text"])
-
     def suggest_code_fix(self, code_block, finding_type):
-        prompt = f"""### System: You are AegisShield, a helpful engineering mentor.
+        prompt = f"""### System: You are AegisShield, a professional security engineer.
 ### User: The following code has a {finding_type}:
 {code_block}
-Could you rewrite this code to be secure, and give a brief, friendly explanation of what you changed? Print the explanation first, then the code snippet.
+Could you rewrite this code to be secure? Output ONLY the corrected code inside a markdown block (e.g. ```python). NO explanations, NO conversational filler.
 ### Assistant:"""
-        outputs = self.pipe(prompt, max_new_tokens=250, do_sample=True, temperature=0.3)
+        
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 SLM: Generating secure rewrite (Live Stream below)...")
+        print("-" * 30)
+        streamer = TextStreamer(self.tokenizer, skip_prompt=True, skip_special_tokens=True)
+        
+        # Dynamic token limit: more context on powerful systems
+        max_tokens = 400 if self.device != "cpu" else 200
+
+        outputs = self.pipe(
+            prompt, 
+            max_new_tokens=max_tokens, 
+            do_sample=True, 
+            temperature=0.1, 
+            streamer=streamer
+        )
+        print("-" * 30)
         return self.clean_output(outputs[0]["generated_text"])
-
-    def review_code_logic(self, code_block, finding_type):
-        prompt = f"""### System: You are AegisShield, a friendly security mentor.
-### User: Could you look at this code block for a potential {finding_type}?
-{code_block}
-Is this actually dangerous? Please give me a friendly, one-sentence verdict.
-### Assistant:"""
-        outputs = self.pipe(prompt, max_new_tokens=100, do_sample=True, temperature=0.3)
-        return self.clean_output(outputs[0]["generated_text"])
-
-    def determine_strategy(self, file_manifest, used_ports):
-        prompt = f"""### System: You are AegisShield, a strategic security AI.
-### User: Root files: {file_manifest}. Used ports: {used_ports}. 
-Identify tech stack, suggest a deceptive identity, and 4 ghost ports.
-Provide JSON only: {{"tech_stack": "...", "deceptive_server": "...", "ghost_ports": [21, 2222, ...]}}
-### Assistant:"""
-        outputs = self.pipe(prompt, max_new_tokens=200, do_sample=True, temperature=0.2)
-        return self.clean_output(outputs[0]["generated_text"])
-
-    def classify_traffic(self, traffic_batch):
-        prompt = f"""### System: You are AegisShield, an intellectual and highly efficient Ethical Hacker and SOC Analyst.
-### User: Evaluate this batch of web traffic hits:
-{traffic_batch}
-Analyze the intent behind this traffic using advanced penetration testing methodologies (like OWASP Top 10 or MITRE ATT&CK). Provide a powerful, concise defense theory estimating what the attacker is trying to achieve.
-### Assistant:"""
-        outputs = self.pipe(prompt, max_new_tokens=150, do_sample=True, temperature=0.5)
-        return self.clean_output(outputs[0]["generated_text"])
-
-    def inspect_payload(self, request_string):
-        prompt = f"""### System: You are AegisShield, a Semantic Web Application Firewall (AI WAF).
-### User: Inspect this HTTP request payload: "{request_string}"
-Is this attempting to exploit a vulnerability (like obfuscated SQLi, XSS, or Directory Traversal)? Reply with exactly one word: "MALICIOUS" or "SAFE". Do not add any other text.
-### Assistant:"""
-        # Strict low temperature for binary classification
-        outputs = self.pipe(prompt, max_new_tokens=10, do_sample=True, temperature=0.1)
-        response = self.clean_output(outputs[0]["generated_text"]).upper()
-        if "MALICIOUS" in response: return "MALICIOUS"
-        return "SAFE"
-
-    def get_junk_patterns(self, tech_stack):
-        prompt = f"""### System: You are AegisShield, a system optimization AI.
-### User: I am analyzing a project with the following tech stack: "{tech_stack}".
-Identify up to 5 common temporary, cache, or build artifact file extensions or directory names that can be safely deleted to save space (e.g. .pyc, node_modules, __pycache__).
-Provide the result ONLY as a JSON list of strings, like [".pyc", "__pycache__"].
-### Assistant:"""
-        outputs = self.pipe(prompt, max_new_tokens=100, do_sample=True, temperature=0.1)
-        raw_output = self.clean_output(outputs[0]["generated_text"])
-        try:
-            # Extract list from JSON output
-            import json
-            import re
-            match = re.search(r'\[(.*?)\]', raw_output, re.DOTALL)
-            if match:
-                patterns = json.loads(f'[{match.group(1)}]')
-                return [p for p in patterns if isinstance(p, str) and len(p) > 1]
-        except Exception:
-            pass
-        # Fallback patterns if SLM fails to generate proper JSON
-        return [".pyc", "__pycache__", ".log.bak", "tmp", "temp"]
-
-    def generate_av_signatures(self, tech_stack):
-        prompt = f"""### System: You are AegisShield, a malware analysis AI.
-### User: Generate 3 specific file names, extensions, or code snippets (signatures) commonly associated with modern malware, webshells, or backdoors targeting a "{tech_stack}" stack.
-Provide the result ONLY as a JSON list of strings, like ["b374k.php", "eval(base64_decode(", ".sh.x"].
-### Assistant:"""
-        outputs = self.pipe(prompt, max_new_tokens=150, do_sample=True, temperature=0.2)
-        raw_output = self.clean_output(outputs[0]["generated_text"])
-        try:
-            import json
-            import re
-            match = re.search(r'\[(.*?)\]', raw_output, re.DOTALL)
-            if match:
-                patterns = json.loads(f'[{match.group(1)}]')
-                return [p for p in patterns if isinstance(p, str) and len(p) > 2]
-        except Exception:
-            pass
-        # Fallbacks
-        return ["eval(", "base64_decode", "system(", "exec(", "shell_exec", "passthru", ".locked", "miner"]
-
-    def analyze_suspicious_file(self, file_content):
-        # Truncate content to avoid token limit
-        snippet = file_content[:1500] if len(file_content) > 1500 else file_content
-        prompt = f"""### System: You are AegisShield, an expert malware reverse-engineer.
-### User: Analyze the following file content snippet:
-```
-{snippet}
-```
-Is this definitively a malicious script (like a webshell, backdoor, or ransomware)? Reply with exactly one word: "MALICIOUS" or "SAFE".
-### Assistant:"""
-        outputs = self.pipe(prompt, max_new_tokens=10, do_sample=False, temperature=0.0)
-        response = self.clean_output(outputs[0]["generated_text"]).upper()
-        if "MALICIOUS" in response: return "MALICIOUS"
-        return "SAFE"
 
 if __name__ == "__main__":
     print("SLM_READY")

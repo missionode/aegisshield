@@ -68,6 +68,7 @@ run_daemon() {
     
     # Initial scan across all nodes
     run_all_nodes_analysis
+    python3 slm_doctor.py >> "$LOG_FILE" 2>&1
     
     while true; do
         # Process Monitoring
@@ -77,6 +78,7 @@ run_daemon() {
         
         # 6-Hour Pulse Logic (handled by cron, but here for robustness)
         run_all_nodes_analysis
+        python3 slm_doctor.py >> "$LOG_FILE" 2>&1
         
         # Periodic tasks
         ((count++))

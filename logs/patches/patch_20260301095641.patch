@@ -1,0 +1,44 @@
+--- /Users/syamnath/Desktop/Projects/Plantdoctor/aegisshield/digital_twin.py	2026-03-01 09:54:01
++++ digital_twin/aegisshield/digital_twin.py	2026-03-01 09:56:41
+@@ -86,7 +86,7 @@
+         log_message("INFO", f"Optimization: Loaded {len(hardened_snippets)} hardened snippets to skip.")
+     
+     # 3. Recursive scan
+-    exclude_patterns = ["aegisshield", "digital_twin", "logs", ".git", ".venv", "venv", "node_modules", "site-packages", "__pycache__"]
++    exclude_patterns = ["digital_twin", "logs", ".git", ".venv", "venv", "node_modules", "site-packages", "__pycache__"]
+     
+     for root, dirs, files in os.walk(root_dir):
+         if any(exc in root for exc in exclude_patterns):
+@@ -97,16 +97,22 @@
+             
+             # Logic Flaws: Contextual Analysis
+             if f.endswith((".py", ".js", ".php", ".sh")):
+-                try:
+-                    with open(file_path, "r", errors="ignore") as code_file:
+-                        lines = code_file.readlines()
+-                        logic_risks = {
+-                            "eval(": "Code injection risk.",
+-                            "shell=True": "Command injection risk.",
+-                            "os.system(": "Insecure execution risk.",
+-                            "apiKey =": "Hardcoded secret risk."
+-                        }
+-                        for i, line in enumerate(lines):
++try:
++    with open(file_path, "r", errors="ignore") as code_file:
++        lines = code_file.readlines()
++        logic_risks = {
++            "eval(": "Code injection risk.",
++            "shell=True": "Command injection risk.",
++            "os.system(": "Insecure execution risk.",
++            "apiKey =": "Hardcoded secret risk."
++        }
++        for I, line in enumerate(lines):
++            if I in logic_risks:
++                print(f"{i+1}. {line}")
++            else:
++                print(line)
++except FileNotFoundError:
++    print("File not found.")
+                             for pattern, desc in logic_risks.items():
+                                 if pattern in line:
+                                     # Extract context block (5 lines around)
