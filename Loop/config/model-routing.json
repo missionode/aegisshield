@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "catalogAsOf": "2026-08-22",
+  "codexMinimumVersion": "0.148.0",
+  "routes": {
+    "simple": {
+      "model": "gpt-5.6-luna",
+      "effort": "low",
+      "fallbacks": [
+        { "model": "gpt-5.6-terra", "effort": "low" }
+      ]
+    },
+    "focused": {
+      "model": "gpt-5.6-luna",
+      "effort": "low",
+      "fallbacks": [
+        { "model": "gpt-5.6-terra", "effort": "low" }
+      ]
+    },
+    "standard": {
+      "model": "gpt-5.6-terra",
+      "effort": "medium",
+      "fallbacks": [
+        { "model": "gpt-5.6-sol", "effort": "medium" }
+      ]
+    },
+    "reasoning": {
+      "model": "gpt-5.6-sol",
+      "effort": "high",
+      "fallbacks": [
+        { "model": "gpt-5.5", "effort": "high" }
+      ]
+    },
+    "high-risk": {
+      "model": "gpt-5.6-sol",
+      "effort": "xhigh",
+      "fallbacks": [
+        { "model": "gpt-5.5", "effort": "xhigh" }
+      ]
+    },
+    "large-context": {
+      "model": "gpt-5.6-sol",
+      "effort": "high",
+      "fallbacks": [
+        { "model": "gpt-5.5", "effort": "high" }
+      ]
+    },
+    "browser": {
+      "model": "gpt-5.6-terra",
+      "effort": "medium",
+      "fallbacks": [
+        { "model": "gpt-5.6-sol", "effort": "medium" }
+      ]
+    }
+  }
+}
